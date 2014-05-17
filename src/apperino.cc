@@ -4,11 +4,15 @@
 * Wrapper for SDL_Init  *
 * * * * * * * * * * * * */
 Apperino::Apperino(Uint32 flags) {
+    assert(theApperino == nullptr);
     if (SDL_Init(flags) < 0) {
         // TODO: Exception
         // SDL failed to initiate
     }
+    theApperino = this;
 }
+
+Apperino *Apperino::theApperino = nullptr;
 
 std::shared_ptr<Windowrino> Apperino::addWindow(
     const char *title,
@@ -32,7 +36,9 @@ std::shared_ptr<Windowrino> Apperino::addWindow(
 }
 
 Apperino::~Apperino() {
+    assert(theApperino == this);
     SDL_Quit();
+    theApperino = nullptr;
 }
 
 /*
@@ -58,13 +64,9 @@ Windowrino::Windowrino(
     if(!win) {
         // TODO: exception
         // window creation failed
-        std::cout << "Could not create window" << std::endl;
     }
-
-    std::cout << "created" << std::endl;
 }
 
 Windowrino::~Windowrino() {
     SDL_DestroyWindow(win);
-    std::cout << "DESTROYED" << std::endl;
 }

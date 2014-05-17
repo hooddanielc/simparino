@@ -26,7 +26,6 @@ int main(int argc, char *argv[]) {
 
     // event handling
     SDL_Event event;
-    
     int keep_goin = 1;
     while(keep_goin) {
         while( SDL_PollEvent( &event ) ){
@@ -40,7 +39,6 @@ int main(int argc, char *argv[]) {
               case SDL_KEYUP:
                 if(event.key.keysym.sym == SDLK_0) {
                     std::cout << "I pressed zero :p" << std::endl;
-                    
                 }
                 break;
               default:

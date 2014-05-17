@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <memory>
+#include <cassert>
 
 class Windowrino {
 public:
@@ -36,6 +37,11 @@ public:
         int h,
         Uint32 flags
     );
+    static Apperino *get() {
+        assert(theApperino != nullptr);
+        return theApperino;
+    }
 private:
     std::vector<std::shared_ptr<Windowrino>> windows;
+    static Apperino *theApperino;
 };
