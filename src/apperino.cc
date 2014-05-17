@@ -67,6 +67,34 @@ Windowrino::Windowrino(
     }
 }
 
+void Windowrino::setPosition(int x, int y) {
+    SDL_SetWindowPosition(win, x, y);
+}
+
+void Windowrino::setSize(int w, int h) {
+    SDL_SetWindowSize(win, w, h);
+}
+
+void Windowrino::setFullscreen(Uint32 flags) {
+    SDL_SetWindowFullscreen(win, flags);
+}
+
+void Windowrino::setMaxSize(int w, int h) {
+    SDL_SetWindowMaximumSize(win, w, h);
+}
+
+void Windowrino::setMinSize(int w, int h) {
+    SDL_SetWindowMinimumSize(win, w, h);
+}
+
+void Windowrino::minimize() {
+    SDL_MinimizeWindow(win);
+}
+
+void Windowrino::maximize() {
+    SDL_MaximizeWindow(win);
+}
+
 Windowrino::~Windowrino() {
     SDL_DestroyWindow(win);
 }

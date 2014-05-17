@@ -1,9 +1,12 @@
 #pragma once
-#include <SDL2/SDL.h>
+
 #include <vector>
 #include <iostream>
 #include <memory>
 #include <cassert>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
 
 class Windowrino {
 public:
@@ -13,12 +16,18 @@ public:
         int y,
         int w,
         int h,
-        Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
+        Uint32 flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
     );
     ~Windowrino();
     Windowrino(const Windowrino &) = delete;
     Windowrino &operator=(const Windowrino &) = delete;
-    friend class Apperino;
+    void setPosition(int x, int y);
+    void setSize(int w, int h);
+    void setMaxSize(int w, int h);
+    void setMinSize(int w, int h);
+    void setFullscreen(Uint32 flags = SDL_WINDOW_FULLSCREEN_DESKTOP);
+    void minimize();
+    void maximize();
 private:
     SDL_Window *win;
 };
@@ -35,7 +44,7 @@ public:
         int y,
         int w,
         int h,
-        Uint32 flags
+        Uint32 flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
     );
     static Apperino *get() {
         assert(theApperino != nullptr);
