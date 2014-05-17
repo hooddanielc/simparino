@@ -10,7 +10,7 @@ Apperino::Apperino(Uint32 flags) {
     }
 }
 
-Windowrino Apperino::addWindow(
+std::shared_ptr<Windowrino> Apperino::addWindow(
     const char *title,
     int x,
     int y,
@@ -18,7 +18,7 @@ Windowrino Apperino::addWindow(
     int h,
     Uint32 flags
 ) {
-    Windowrino win(
+    auto win = std::make_shared<Windowrino>(
         title,
         x,
         y,
@@ -38,7 +38,6 @@ Apperino::~Apperino() {
 /*
 * Wrapper for SDL_Window  *
 * * * * * * * * * * * * * */
-Windowrino::Windowrino(){};
 Windowrino::Windowrino(
     const char *title,
     int x,

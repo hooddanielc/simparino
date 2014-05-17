@@ -6,8 +6,17 @@ int main(int argc, char *argv[]) {
 
     Apperino app;
 
-    Windowrino win = app.addWindow(
-        "",
+    app.addWindow(
+        "Window 1",
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        512,
+        512,
+        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
+    );
+
+    app.addWindow(
+        "Window 2",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         512,
@@ -17,9 +26,7 @@ int main(int argc, char *argv[]) {
 
     // event handling
     SDL_Event event;
-    /* Poll for events. SDL_PollEvent() returns 0 when there are no  */
-    /* more events on the event queue, our while loop will exit when */
-    /* that occurs.                                                  */
+    
     int keep_goin = 1;
     while(keep_goin) {
         while( SDL_PollEvent( &event ) ){
