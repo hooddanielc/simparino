@@ -14,7 +14,7 @@ Apperino::Apperino(Uint32 flags) {
 
 Apperino *Apperino::theApperino = nullptr;
 
-std::shared_ptr<Windowrino> Apperino::addWindow(
+std::shared_ptr<Windowrino> Apperino::openWindow(
     const char *title,
     int x,
     int y,
@@ -35,6 +35,27 @@ std::shared_ptr<Windowrino> Apperino::addWindow(
     return win;
 }
 
+void Apperino::on(Uint32 type, std::function<void (const SDL_Event &)> &&cb) {
+    callbacks[type] = std::move(cb);
+}
+
+void Apperino::run() {
+    SDL_Event event;
+    while(running) {
+        SDL_Delay(1);
+        while(SDL_PollEvent(&event)){
+            auto iter = callbacks.find(event.type);
+            if (iter != callbacks.end()) {
+                (iter->second)(event);
+            }
+        }
+    }
+}
+
+void Apperino::quit() {
+    running = false;
+}
+
 Apperino::~Apperino() {
     assert(theApperino == this);
     SDL_Quit();
@@ -52,7 +73,6 @@ Windowrino::Windowrino(
     int h,
     Uint32 flags
 ) {
-    // initialize window
     win = SDL_CreateWindow(
         title,
         x,

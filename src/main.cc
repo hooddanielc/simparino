@@ -1,11 +1,13 @@
 #include "apperino.h"
 
+const char *lol = "OMG";
+
 /* Our program's entry point */
 int main(int argc, char *argv[]) {
 
     Apperino app;
 
-    auto win = app.addWindow(
+    auto win = app.openWindow(
         "Window 1",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
@@ -15,32 +17,12 @@ int main(int argc, char *argv[]) {
 
     win->setMinSize(800, 600);
 
-    // event handling
-    SDL_Event event;
-    int keep_goin = 1;
-    while(keep_goin) {
-        SDL_Delay(5);
-        while(SDL_PollEvent(&event)){
-            /* We are only worried about SDL_KEYDOWN and SDL_KEYUP events */
-            switch(event.type){
-              case SDL_KEYDOWN:
-                if(event.key.keysym.sym == SDLK_0) {
-                    keep_goin = 0;
-                }
-                break;
-              case SDL_KEYUP:
-                if(event.key.keysym.sym == SDLK_5) {
-                    win->maximize();
-                }
-                if(event.key.keysym.sym == SDLK_6) {
-                    win->minimize();
-                }
-                break;
-              default:
-                break;
-            }
-        }
-    }
+    app.on(SDL_KEYDOWN, [&app](const SDL_Event &event) {
+        std::cout << "keydown" << std::endl;
+        app.quit();
+    });
+
+    app.run();
 
     return 0;
 }

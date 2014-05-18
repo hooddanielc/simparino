@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <cassert>
 
@@ -38,7 +39,11 @@ public:
     ~Apperino();
     Apperino(const Apperino &) = delete;
     Apperino &operator=(const Apperino &) = delete;
-    std::shared_ptr<Windowrino> addWindow(
+    static Apperino *get() {
+        assert(theApperino != nullptr);
+        return theApperino;
+    }
+    std::shared_ptr<Windowrino> openWindow(
         const char *title,
         int x,
         int y,
@@ -46,11 +51,12 @@ public:
         int h,
         Uint32 flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
     );
-    static Apperino *get() {
-        assert(theApperino != nullptr);
-        return theApperino;
-    }
+    void run();
+    void quit();
+    void on(Uint32 type, std::function<void (const SDL_Event &)> &&cb);
 private:
+    bool running = true;
     std::vector<std::shared_ptr<Windowrino>> windows;
+    std::map<Uint32, std::function<void (const SDL_Event &)>> callbacks;
     static Apperino *theApperino;
 };
