@@ -7,7 +7,7 @@
 #include <cassert>
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
+#include <OpenGL/gl.h>
 
 class Windowrino {
 public:
@@ -29,8 +29,10 @@ public:
     void setFullscreen(Uint32 flags = SDL_WINDOW_FULLSCREEN_DESKTOP);
     void minimize();
     void maximize();
+    void swap();
 private:
     SDL_Window *win;
+    SDL_GLContext ctx;
 };
 
 class Apperino {

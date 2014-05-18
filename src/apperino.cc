@@ -73,6 +73,9 @@ Windowrino::Windowrino(
     int h,
     Uint32 flags
 ) {
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     win = SDL_CreateWindow(
         title,
         x,
@@ -85,6 +88,8 @@ Windowrino::Windowrino(
         // TODO: exception
         // window creation failed
     }
+
+    ctx = SDL_GL_CreateContext(win);
 }
 
 void Windowrino::setPosition(int x, int y) {
@@ -115,6 +120,11 @@ void Windowrino::maximize() {
     SDL_MaximizeWindow(win);
 }
 
+void Windowrino::swap() {
+    SDL_GL_SwapWindow(win);
+}
+
 Windowrino::~Windowrino() {
+    SDL_GL_DeleteContext(ctx);
     SDL_DestroyWindow(win);
 }

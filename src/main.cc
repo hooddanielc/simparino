@@ -1,8 +1,5 @@
 #include "apperino.h"
 
-const char *lol = "OMG";
-
-/* Our program's entry point */
 int main(int argc, char *argv[]) {
 
     Apperino app;
@@ -11,14 +8,18 @@ int main(int argc, char *argv[]) {
         "Window 1",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        512,
-        512
+        800,
+        600
     );
 
-    win->setMinSize(800, 600);
-
-    app.on(SDL_KEYDOWN, [&app](const SDL_Event &event) {
-        std::cout << "keydown" << std::endl;
+    app.on(SDL_KEYDOWN, [&app, &win](const SDL_Event &event) {
+        glClearColor ( 0.0, 1.0, 0.0, 1.0 );
+        glClear ( GL_COLOR_BUFFER_BIT );
+        printf("Version=%s\n", glGetString(GL_VERSION));
+        printf("Version=%s\n", glGetString(GL_VENDOR));
+        printf("Version=%s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+        win->swap();
+        SDL_Delay(5000);
         app.quit();
     });
 
