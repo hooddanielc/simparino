@@ -30,7 +30,6 @@ std::shared_ptr<Windowrino> Apperino::openWindow(
         h,
         flags
     );
-    //windows.push_back(win);
     windowrinos[win->id] = win;
     return win;
 }
