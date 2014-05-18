@@ -22,6 +22,7 @@ public:
     ~Windowrino();
     Windowrino(const Windowrino &) = delete;
     Windowrino &operator=(const Windowrino &) = delete;
+    Uint32 id;
     void setPosition(int x, int y);
     void setSize(int w, int h);
     void setMaxSize(int w, int h);
@@ -30,6 +31,8 @@ public:
     void minimize();
     void maximize();
     void swap();
+    void makeCurrentCtx();
+    void on(Uint32 type, std::function<void (std::shared_ptr<Windowrino>, const SDL_Event &)> &&cb);
 private:
     SDL_Window *win;
     SDL_GLContext ctx;
@@ -58,7 +61,10 @@ public:
     void on(Uint32 type, std::function<void (const SDL_Event &)> &&cb);
 private:
     bool running = true;
-    std::vector<std::shared_ptr<Windowrino>> windows;
-    std::map<Uint32, std::function<void (const SDL_Event &)>> callbacks;
+    std::map<Uint32, std::shared_ptr<Windowrino>> windowrinos;
+    std::map<Uint32, std::vector<std::function<void (const SDL_Event &)>>> callbacks;
+    std::map<Uint32, std::map<Uint32, std::vector<std::function<void (std::shared_ptr<Windowrino>, const SDL_Event &)>>>> windowCallbacks;
+    void on(Uint32 windowId, Uint32 type, std::function<void (std::shared_ptr<Windowrino>, const SDL_Event &)> &&cb);
     static Apperino *theApperino;
+friend void Windowrino::on(Uint32 type, std::function<void (std::shared_ptr<Windowrino>, const SDL_Event &)> &&cb);
 };

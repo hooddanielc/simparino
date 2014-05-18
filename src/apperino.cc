@@ -30,13 +30,17 @@ std::shared_ptr<Windowrino> Apperino::openWindow(
         h,
         flags
     );
-    windows.push_back(win);
-
+    //windows.push_back(win);
+    windowrinos[win->id] = win;
     return win;
 }
 
 void Apperino::on(Uint32 type, std::function<void (const SDL_Event &)> &&cb) {
-    callbacks[type] = std::move(cb);
+    callbacks[type].push_back(std::move(cb));
+}
+
+void Apperino::on(Uint32 windowId, Uint32 type, std::function<void (std::shared_ptr<Windowrino>, const SDL_Event &)> &&cb) {
+    windowCallbacks[windowId][type].push_back(std::move(cb));
 }
 
 void Apperino::run() {
@@ -44,9 +48,20 @@ void Apperino::run() {
     while(running) {
         SDL_Delay(1);
         while(SDL_PollEvent(&event)){
-            auto iter = callbacks.find(event.type);
-            if (iter != callbacks.end()) {
-                (iter->second)(event);
+            auto iterCbs = callbacks.find(event.type);
+            if(iterCbs != callbacks.end()) {
+                for(auto it = iterCbs->second.begin(); it != iterCbs->second.end(); ++it) {
+                    (*it)(event);
+                }
+            }
+            auto iterWindowCbGroups = windowCallbacks.find(event.window.windowID);
+            if(iterWindowCbGroups != windowCallbacks.end()) {
+                auto iterWindowCbs = iterWindowCbGroups->second.find(event.type);
+                if(iterWindowCbs != iterWindowCbGroups->second.end()) {
+                    for(auto it = iterWindowCbs->second.begin(); it != iterWindowCbs->second.end(); ++it) {
+                        (*it)(windowrinos[event.window.windowID], event);
+                    }
+                }
             }
         }
     }
@@ -87,8 +102,9 @@ Windowrino::Windowrino(
     if(!win) {
         // TODO: exception
         // window creation failed
+        return;
     }
-
+    id = SDL_GetWindowID(win);
     ctx = SDL_GL_CreateContext(win);
 }
 
@@ -122,6 +138,14 @@ void Windowrino::maximize() {
 
 void Windowrino::swap() {
     SDL_GL_SwapWindow(win);
+}
+
+void Windowrino::on(Uint32 type, std::function<void (std::shared_ptr<Windowrino>, const SDL_Event &)> &&cb) {
+    Apperino::get()->on(id, type, std::move(cb));
+}
+
+void Windowrino::makeCurrentCtx() {
+    SDL_GL_MakeCurrent(win, ctx);
 }
 
 Windowrino::~Windowrino() {
