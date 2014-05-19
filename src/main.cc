@@ -35,9 +35,14 @@ int main(int argc, char *argv[]) {
     });
 
 	app.on(SDL_KEYDOWN, [](const SDL_Event &event) {
-		if (event.key.keysym.sym == SDLK_ESCAPE) {
+		if(event.key.keysym.sym == SDLK_ESCAPE) {
 			Apperino::get()->quit();
 		}
+
+        if(event.key.keysym.sym == SDLK_0) {
+            auto f = Apperino::get()->readfile("teapot.obj");
+            std::cout << f << std::endl;
+        }
 	});
 
     app.on(SDL_QUIT, [](const SDL_Event &event) {

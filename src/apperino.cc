@@ -66,6 +66,22 @@ void Apperino::run() {
     }
 }
 
+std::string Apperino::readfile(const char *path) {
+    std::string thepath = "res/";
+    thepath += path;
+    std::string contents;
+    std::fstream fs;
+    fs.open(thepath);
+    if(fs.is_open()) {
+        std::string line;
+        while(std::getline(fs, line)) {
+            contents += line + "\n";
+        }
+        fs.close();
+    }
+    return contents;
+}
+
 void Apperino::quit() {
     running = false;
 }

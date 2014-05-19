@@ -6,6 +6,7 @@
 #include <memory>
 #include <cassert>
 #include <functional>
+#include <fstream>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
 #include "SDL.h"
@@ -66,6 +67,7 @@ public:
     void run();
     void quit();
     void on(Uint32 type, std::function<void (const SDL_Event &)> &&cb);
+    std::string readfile(const char *path);
 private:
     bool running = true;
     std::map<Uint32, std::shared_ptr<Windowrino>> windowrinos;
