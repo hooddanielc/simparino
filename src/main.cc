@@ -34,6 +34,12 @@ int main(int argc, char *argv[]) {
         win->swap();
     });
 
+	app.on(SDL_KEYDOWN, [](const SDL_Event &event) {
+		if (event.key.keysym.sym == SDLK_ESCAPE) {
+			Apperino::get()->quit();
+		}
+	});
+
     app.on(SDL_QUIT, [](const SDL_Event &event) {
         Apperino::get()->quit();
     });

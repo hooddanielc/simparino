@@ -5,9 +5,15 @@
 #include <map>
 #include <memory>
 #include <cassert>
+#include <functional>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+#include "SDL.h"
+#include "SDL_opengl.h"
+#else
 #include <SDL2/SDL.h>
 #include <OpenGL/gl.h>
+#endif
 
 class Windowrino {
 public:
@@ -39,6 +45,7 @@ private:
 };
 
 class Apperino {
+friend void Windowrino::on(Uint32 type, std::function<void(std::shared_ptr<Windowrino>, const SDL_Event &)> &&cb);
 public:
     Apperino(Uint32 flags = SDL_INIT_VIDEO);
     ~Apperino();
@@ -66,5 +73,4 @@ private:
     std::map<Uint32, std::map<Uint32, std::vector<std::function<void (std::shared_ptr<Windowrino>, const SDL_Event &)>>>> windowCallbacks;
     void on(Uint32 windowId, Uint32 type, std::function<void (std::shared_ptr<Windowrino>, const SDL_Event &)> &&cb);
     static Apperino *theApperino;
-friend void Windowrino::on(Uint32 type, std::function<void (std::shared_ptr<Windowrino>, const SDL_Event &)> &&cb);
 };
