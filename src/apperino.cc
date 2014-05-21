@@ -103,8 +103,6 @@ Windowrino::Windowrino(
     int h,
     Uint32 flags
 ) {
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     win = SDL_CreateWindow(
         title,
@@ -166,4 +164,51 @@ void Windowrino::makeCurrentCtx() {
 Windowrino::~Windowrino() {
     SDL_GL_DeleteContext(ctx);
     SDL_DestroyWindow(win);
+}
+
+ShaderProgram::ShaderProgram() {
+    id = glCreateProgram();
+}
+
+void ShaderProgram::compile(const char *filename, GLenum shaderType) {
+    GLuint shaderid = glCreateShader(GL_FRAGMENT_SHADER);
+    // compile shader
+    const char *source = Apperino::get()->readfile(filename).c_str();
+    glShaderSource(shaderid, 1, &source, NULL);
+    glCompileShader(shaderid);
+
+    // check if it compiled
+    GLint Result = GL_FALSE;
+    int InfoLogLength;
+
+    glGetShaderiv(shaderid, GL_COMPILE_STATUS, &Result);
+    glGetShaderiv(shaderid, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    std::vector<char> FragmentShaderErrorMessage(InfoLogLength);
+    glGetShaderInfoLog(shaderid, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
+    fprintf(stdout, "%s\n", &FragmentShaderErrorMessage[0]);
+    shaders.push_back(shaderid);
+}
+
+void ShaderProgram::link() {
+    for(auto itr = shaders.begin(); itr < shaders.end(); ++itr) {
+        glAttachShader(id, *itr);
+    }
+    glLinkProgram(id);
+    for(auto itr = shaders.begin(); itr < shaders.end(); ++itr) {
+        glDeleteShader(*itr);
+    }
+
+    // check program
+    GLint Result = GL_FALSE;
+    int InfoLogLength;
+
+    glGetProgramiv(id, GL_LINK_STATUS, &Result);
+    glGetProgramiv(id, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    std::vector<char> ProgramErrorMessage( fmax(InfoLogLength, int(1)) );
+    glGetProgramInfoLog(id, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+    fprintf(stdout, "%s\n", &ProgramErrorMessage[0]);
+}
+
+ShaderProgram::~ShaderProgram() {
+    glDeleteProgram(id);
 }

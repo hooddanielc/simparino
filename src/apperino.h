@@ -1,5 +1,7 @@
 #pragma once
 
+#define GL_GLEXT_PROTOTYPES
+
 #include <vector>
 #include <iostream>
 #include <map>
@@ -13,7 +15,7 @@
 #include "SDL_opengl.h"
 #else
 #include <SDL2/SDL.h>
-#include <OpenGL/gl.h>
+#include <SDL2/SDL_opengl.h>
 #endif
 
 class Windowrino {
@@ -75,4 +77,14 @@ private:
     std::map<Uint32, std::map<Uint32, std::vector<std::function<void (std::shared_ptr<Windowrino>, const SDL_Event &)>>>> windowCallbacks;
     void on(Uint32 windowId, Uint32 type, std::function<void (std::shared_ptr<Windowrino>, const SDL_Event &)> &&cb);
     static Apperino *theApperino;
+};
+
+class ShaderProgram {
+public:
+    ShaderProgram();
+    ~ShaderProgram();
+    void compile(const char* filename, GLenum shaderType);
+    void link();
+    std::vector<GLuint> shaders;
+    GLuint id;
 };
