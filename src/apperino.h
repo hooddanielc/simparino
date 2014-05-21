@@ -79,12 +79,13 @@ private:
     static Apperino *theApperino;
 };
 
-class ShaderProgram {
+class Shaderino {
 public:
-    ShaderProgram();
-    ~ShaderProgram();
+    Shaderino();
+    ~Shaderino();
     void compile(const char* filename, GLenum shaderType);
     void link();
+    void use();
     std::vector<GLuint> shaders;
     GLuint id;
 };

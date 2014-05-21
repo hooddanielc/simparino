@@ -9,6 +9,7 @@ Apperino::Apperino(Uint32 flags) {
         // TODO: Exception
         // SDL failed to initiate
     }
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     theApperino = this;
 }
 
@@ -103,7 +104,6 @@ Windowrino::Windowrino(
     int h,
     Uint32 flags
 ) {
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     win = SDL_CreateWindow(
         title,
         x,
@@ -166,14 +166,15 @@ Windowrino::~Windowrino() {
     SDL_DestroyWindow(win);
 }
 
-ShaderProgram::ShaderProgram() {
+Shaderino::Shaderino() {
     id = glCreateProgram();
 }
 
-void ShaderProgram::compile(const char *filename, GLenum shaderType) {
-    GLuint shaderid = glCreateShader(GL_FRAGMENT_SHADER);
+void Shaderino::compile(const char *filename, GLenum shaderType) {
+    GLuint shaderid = glCreateShader(shaderType);
     // compile shader
-    const char *source = Apperino::get()->readfile(filename).c_str();
+    std::string thesource = Apperino::get()->readfile(filename);
+    const char *source = thesource.c_str();
     glShaderSource(shaderid, 1, &source, NULL);
     glCompileShader(shaderid);
 
@@ -189,7 +190,7 @@ void ShaderProgram::compile(const char *filename, GLenum shaderType) {
     shaders.push_back(shaderid);
 }
 
-void ShaderProgram::link() {
+void Shaderino::link() {
     for(auto itr = shaders.begin(); itr < shaders.end(); ++itr) {
         glAttachShader(id, *itr);
     }
@@ -209,6 +210,10 @@ void ShaderProgram::link() {
     fprintf(stdout, "%s\n", &ProgramErrorMessage[0]);
 }
 
-ShaderProgram::~ShaderProgram() {
+void Shaderino::use() {
+    glUseProgram(id);
+}
+
+Shaderino::~Shaderino() {
     glDeleteProgram(id);
 }
