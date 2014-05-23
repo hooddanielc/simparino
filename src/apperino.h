@@ -42,6 +42,7 @@ public:
     void swap();
     void makeCurrentCtx();
     void on(Uint32 type, std::function<void (std::shared_ptr<Windowrino>, const SDL_Event &)> &&cb);
+    virtual void loop(double time){}
 private:
     SDL_Window *win;
     SDL_GLContext ctx;
@@ -66,6 +67,7 @@ public:
         int h,
         Uint32 flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
     );
+    void addWindow(std::shared_ptr<Windowrino>);
     void run();
     void quit();
     void on(Uint32 type, std::function<void (const SDL_Event &)> &&cb);

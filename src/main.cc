@@ -1,16 +1,25 @@
 #include "apperino.h"
 
+class MyWindow : public Windowrino {
+public:
+    using Windowrino::Windowrino;
+    void loop(double time) {
+        std::cout << "the time is: " << time << std::endl;
+    }
+};
+
 int main(int argc, char *argv[]) {
 
     Apperino app;
 
-    auto win1 = app.openWindow(
+    auto win1 = std::make_shared<MyWindow>(
         "Window 1",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         800,
         600
     );
+    app.addWindow(win1);
 
     win1->on(SDL_KEYDOWN, [](std::shared_ptr<Windowrino> win, const SDL_Event &event) {
         win->makeCurrentCtx();

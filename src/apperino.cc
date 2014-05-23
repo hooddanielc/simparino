@@ -35,6 +35,10 @@ std::shared_ptr<Windowrino> Apperino::openWindow(
     return win;
 }
 
+void Apperino::addWindow(std::shared_ptr<Windowrino> win) {
+    windowrinos[win->id] = win;
+}
+
 void Apperino::on(Uint32 type, std::function<void (const SDL_Event &)> &&cb) {
     callbacks[type].push_back(std::move(cb));
 }
@@ -63,6 +67,9 @@ void Apperino::run() {
                     }
                 }
             }
+        }
+        for(const auto &item : windowrinos) {
+            item.second->loop(SDL_GetTicks());
         }
     }
 }
@@ -166,6 +173,11 @@ Windowrino::~Windowrino() {
     SDL_DestroyWindow(win);
 }
 
+
+/*
+* Helperino for compiling and
+* using shader programinos  *
+* * * * * * * * * * * * * * */
 Shaderino::Shaderino() {
     id = glCreateProgram();
 }
