@@ -2,9 +2,22 @@
 
 class MyWindow : public Windowrino {
 public:
-    using Windowrino::Windowrino;
+    MyWindow(const char *title,
+        int x,
+        int y,
+        int w,
+        int h,
+        Uint32 flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
+    ) : Windowrino(
+        title,
+        x,
+        y,
+        w,
+        h,
+        flags
+    ){}
     void loop(double time) {
-        std::cout << "the time is: " << time << std::endl;
+        //std::cout << "the time is: " << time << std::endl;
     }
 };
 
@@ -19,6 +32,7 @@ int main(int argc, char *argv[]) {
         800,
         600
     );
+
     app.addWindow(win1);
 
     win1->on(SDL_KEYDOWN, [](std::shared_ptr<Windowrino> win, const SDL_Event &event) {
@@ -70,16 +84,16 @@ int main(int argc, char *argv[]) {
     glDisableVertexAttribArray(0);
     win1->swap();
 
-	app.on(SDL_KEYDOWN, [](const SDL_Event &event) {
-		if(event.key.keysym.sym == SDLK_ESCAPE) {
-			Apperino::get()->quit();
-		}
+    app.on(SDL_KEYDOWN, [](const SDL_Event &event) {
+        if(event.key.keysym.sym == SDLK_ESCAPE) {
+            Apperino::get()->quit();
+        }
 
         if(event.key.keysym.sym == SDLK_0) {
             auto f = Apperino::get()->readfile("teapot.obj");
             std::cout << f << std::endl;
         }
-	});
+    });
 
     app.on(SDL_QUIT, [](const SDL_Event &event) {
         Apperino::get()->quit();

@@ -1,7 +1,5 @@
 #pragma once
 
-#define GL_GLEXT_PROTOTYPES
-
 #include <vector>
 #include <iostream>
 #include <map>
@@ -9,14 +7,11 @@
 #include <cassert>
 #include <functional>
 #include <fstream>
+#include <string>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
-#include "SDL.h"
-#include "SDL_opengl.h"
-#else
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glew.h>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
-#endif
 
 class Windowrino {
 public:

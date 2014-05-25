@@ -87,6 +87,7 @@ std::string Apperino::readfile(const char *path) {
         }
         fs.close();
     }
+
     return contents;
 }
 
@@ -126,6 +127,10 @@ Windowrino::Windowrino(
     }
     id = SDL_GetWindowID(win);
     ctx = SDL_GL_CreateContext(win);
+    // Must be called after opengl context is created
+    glewExperimental = GL_TRUE;
+    GLenum glew_error = glewInit();
+    assert(!glew_error);
 }
 
 void Windowrino::setPosition(int x, int y) {
@@ -217,7 +222,7 @@ void Shaderino::link() {
 
     glGetProgramiv(id, GL_LINK_STATUS, &Result);
     glGetProgramiv(id, GL_INFO_LOG_LENGTH, &InfoLogLength);
-    std::vector<char> ProgramErrorMessage( fmax(InfoLogLength, int(1)) );
+    std::vector<char> ProgramErrorMessage(fmax(InfoLogLength, int(1)));
     glGetProgramInfoLog(id, InfoLogLength, NULL, &ProgramErrorMessage[0]);
     fprintf(stdout, "%s\n", &ProgramErrorMessage[0]);
 }
