@@ -1,4 +1,5 @@
 #include "apperino.h"
+#include "worldowrino.h"
 
 class MyWindow : public Windowrino {
 public:
@@ -25,6 +26,8 @@ int main(int argc, char *argv[]) {
 
     Apperino app;
 
+    auto world = std::make_shared<Worldowrino>();
+
     auto win1 = std::make_shared<MyWindow>(
         "Window 1",
         SDL_WINDOWPOS_CENTERED,
@@ -42,6 +45,10 @@ int main(int argc, char *argv[]) {
         win->swap();
     });
 
+    Shapodino teapot("res/test_objs/teapot.obj");
+    teapot.getMesh();
+    Camerino camera;
+
     // Test our shaders and draw a triangle
     Shaderino shader;
     shader.compile("shaders/test.vs", GL_VERTEX_SHADER);
@@ -49,15 +56,24 @@ int main(int argc, char *argv[]) {
     shader.link();
     shader.use();
 
+    // Enable depth test
+    glEnable(GL_DEPTH_TEST);
+    // Accept fragment if it closer to the camera than the former one
+    glDepthFunc(GL_LESS);
+
     GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
     // An array of 3 vectors which represents 3 vertices
     static const GLfloat g_vertex_buffer_data[] = {
-       -1.0f, -1.0f, 0.0f,
-       1.0f, -1.0f, 0.0f,
-       0.0f,  1.0f, 0.0f,
+       -1.0f, -0.5f, -0.5f,
+       1.0f, -1.0f, -0.5f,
+       0.0f,  1.0f, -0.5f,
     };
+
+    GLuint MatrixID = glGetUniformLocation(shader.id, "MVP");
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(camera.mvp));
+
     // This will identify our vertex buffer
     GLuint vertexbuffer;
     // Generate 1 buffer, put the resulting identifier in vertexbuffer
@@ -65,7 +81,11 @@ int main(int argc, char *argv[]) {
     // The following commands will talk about our 'vertexbuffer' buffer
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     // Give our vertices to OpenGL.
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+    auto positions = teapot.getMesh();
+    glBufferData(GL_ARRAY_BUFFER, positions.size() * 4, positions.data(), GL_STATIC_DRAW);
+
     // 1rst attribute buffer : vertices
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -79,8 +99,8 @@ int main(int argc, char *argv[]) {
     );
     // Draw the triangle !
     glClearColor(0.0, 1.0, 0.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDrawArrays(GL_TRIANGLES, 0, positions.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
     glDisableVertexAttribArray(0);
     win1->swap();
 
