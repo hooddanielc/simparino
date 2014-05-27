@@ -75,14 +75,3 @@ private:
     void on(Uint32 windowId, Uint32 type, std::function<void (std::shared_ptr<Windowrino>, const SDL_Event &)> &&cb);
     static Apperino *theApperino;
 };
-
-class Shaderino {
-public:
-    Shaderino();
-    ~Shaderino();
-    void compile(const char* filename, GLenum shaderType);
-    void link();
-    void use();
-    std::vector<GLuint> shaders;
-    GLuint id;
-};

@@ -45,63 +45,44 @@ int main(int argc, char *argv[]) {
         win->swap();
     });
 
-    Shapodino teapot("res/test_objs/teapot.obj");
-    teapot.getMesh();
+    // Enable depth test
+    glEnable(GL_DEPTH_TEST);
+    // Accept fragment if it closer to the camera than the former one
+    glDepthFunc(GL_LESS);
+
+    // create a "camera"
     Camerino camera;
 
-    // Test our shaders and draw a triangle
+    // Load a teapot shape
+    Shapodino teapot("res/test_objs/teapot.obj");
+    teapot.getMesh();
+
+    // Compile a shader
     Shaderino shader;
     shader.compile("shaders/test.vs", GL_VERTEX_SHADER);
     shader.compile("shaders/test.fs", GL_FRAGMENT_SHADER);
     shader.link();
     shader.use();
 
-    // Enable depth test
-    glEnable(GL_DEPTH_TEST);
-    // Accept fragment if it closer to the camera than the former one
-    glDepthFunc(GL_LESS);
-
-    GLuint VertexArrayID;
-    glGenVertexArrays(1, &VertexArrayID);
-    glBindVertexArray(VertexArrayID);
-    // An array of 3 vectors which represents 3 vertices
-    static const GLfloat g_vertex_buffer_data[] = {
-       -1.0f, -0.5f, -0.5f,
-       1.0f, -1.0f, -0.5f,
-       0.0f,  1.0f, -0.5f,
-    };
-
+    // set MVP uniform
     GLuint MatrixID = glGetUniformLocation(shader.id, "MVP");
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(camera.mvp));
 
-    // This will identify our vertex buffer
-    GLuint vertexbuffer;
-    // Generate 1 buffer, put the resulting identifier in vertexbuffer
-    glGenBuffers(1, &vertexbuffer);
-    // The following commands will talk about our 'vertexbuffer' buffer
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    // Give our vertices to OpenGL.
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
+    // Create a bufferino to feed data to shaderino
     auto positions = teapot.getMesh();
-    glBufferData(GL_ARRAY_BUFFER, positions.size() * 4, positions.data(), GL_STATIC_DRAW);
+    Bufferino buffer;
 
-    // 1rst attribute buffer : vertices
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glVertexAttribPointer(
-       0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-       3,                  // size
-       GL_FLOAT,           // type
-       GL_FALSE,           // normalized?
-       0,                  // stride
-       (void*)0            // array buffer offset
-    );
-    // Draw the triangle !
+    // in vec3 vertexPosition_modelspace; = posisitions.data()
+    buffer.addBuffer(0, positions.data(), positions.size() * 4);
+    buffer.bind();
+
+    // Initiate draw func
     glClearColor(0.0, 1.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLES, 0, positions.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
-    glDisableVertexAttribArray(0);
+
+
+    buffer.disable();
     win1->swap();
 
     app.on(SDL_KEYDOWN, [](const SDL_Event &event) {

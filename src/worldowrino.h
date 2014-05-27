@@ -10,6 +10,8 @@
 #include <iostream>
 #include <GL/glew.h>
 
+#include "apperino.h"
+
 class Worldowrino {
 
 public:
@@ -23,16 +25,6 @@ private:
     btDiscreteDynamicsWorld *dynamicsWorld;
 };
 
-class Shapodino {
-public:
-    Shapodino(const char* fname);
-    ~Shapodino();
-    std::vector<tinyobj::shape_t> shapes;
-    std::vector<float> getMesh();
-private:
-    
-};
-
 class Camerino {
 public:
     glm::mat4 projection;
@@ -41,4 +33,35 @@ public:
     glm::mat4 mvp;
     Camerino();
     ~Camerino();
+};
+
+class Shapodino {
+public:
+    Shapodino(const char *fname);
+    ~Shapodino();
+    void printToConsole();
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<float> getMesh();
+};
+
+class Bufferino {
+public:
+    GLuint vao;
+    std::map<int, GLuint> vbos;
+    void addBuffer(int idx, GLfloat *data, int size);
+    void bind();
+    void disable();
+    Bufferino();
+    ~Bufferino();
+};
+
+class Shaderino {
+public:
+    Shaderino();
+    ~Shaderino();
+    void compile(const char* filename, GLenum shaderType);
+    void link();
+    void use();
+    std::vector<GLuint> shaders;
+    GLuint id;
 };
