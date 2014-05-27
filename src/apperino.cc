@@ -11,6 +11,7 @@ Apperino::Apperino(Uint32 flags) {
     }
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     theApperino = this;
+    Magick::InitializeMagick(nullptr);
 }
 
 Apperino *Apperino::theApperino = nullptr;

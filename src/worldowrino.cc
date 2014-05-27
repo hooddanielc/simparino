@@ -112,7 +112,7 @@ Camerino::Camerino() {
     projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
     // Camera matrix
     view = glm::lookAt(
-        glm::vec3(5,5,5), // Camera is at (4,3,3), in World Space
+        glm::vec3(0,5,5), // Camera is at (4,3,3), in World Space
         glm::vec3(0,0,0), // and looks at the origin
         glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
     );
@@ -144,7 +144,7 @@ void Bufferino::addBuffer(int idx, GLfloat *data, int size) {
     vbos[idx] = vbo;
 }
 
-void Bufferino::bind() {
+void Bufferino::enable() {
     for(auto it = vbos.begin(); it != vbos.end(); ++it) {
         glEnableVertexAttribArray(it->first);
         glBindBuffer(GL_ARRAY_BUFFER, it->second);

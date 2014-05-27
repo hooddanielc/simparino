@@ -13,6 +13,8 @@
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 
+#include "Magick++.h"
+
 class Windowrino {
 public:
     Windowrino(

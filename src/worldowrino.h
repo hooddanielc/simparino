@@ -49,7 +49,7 @@ public:
     GLuint vao;
     std::map<int, GLuint> vbos;
     void addBuffer(int idx, GLfloat *data, int size);
-    void bind();
+    void enable();
     void disable();
     Bufferino();
     ~Bufferino();

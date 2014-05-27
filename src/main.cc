@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 
     win1->on(SDL_KEYDOWN, [](std::shared_ptr<Windowrino> win, const SDL_Event &event) {
         win->makeCurrentCtx();
-        glClearColor(0.0, 1.0, 0.0, 1.0);
+        glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
         win->swap();
     });
@@ -75,18 +75,18 @@ int main(int argc, char *argv[]) {
     // Create some random colors
     for(auto i = 0; i < positions.size(); ++i) {
         colors.push_back((float) rand() / RAND_MAX);
-        std::cout << colors[i] << std::endl;
     }
 
     // in vec3 vertexPosition_modelspace; = posisitions.data()
     buffer.addBuffer(0, positions.data(), positions.size() * 4);
     // in vec3 vertexColor
     buffer.addBuffer(1, colors.data(), colors.size() * 4);
-    buffer.bind();
+    buffer.enable();
 
     // Initiate draw func
-    glClearColor(0.0, 1.0, 0.0, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
     glDrawArrays(GL_TRIANGLES, 0, positions.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
 
     buffer.disable();
