@@ -54,11 +54,17 @@ void Shapodino::printToConsole() {
 
         printf("shape[%ld].vertices: %ld\n", i, shapes[i].mesh.positions.size());
         assert((shapes[i].mesh.positions.size() % 3) == 0);
-        for (size_t v = 0; v < shapes[i].mesh.positions.size() / 3; v++) {
+        for (size_t v = 0; v < shapes[i].mesh.positions.size() / 3; ++v) {
             printf("  v[%ld] = (%f, %f, %f)\n", v,
             shapes[i].mesh.positions[3*v+0],
             shapes[i].mesh.positions[3*v+1],
             shapes[i].mesh.positions[3*v+2]);
+        }
+        for (size_t v = 0; v < shapes[i].mesh.texcoords.size() / 2; ++v) {
+            printf("  vt[%ld] = (%f, %f)\n", v,
+            shapes[i].mesh.texcoords[2*v+0],
+            shapes[i].mesh.texcoords[2*v+1]
+            );
         }
         printf("shape[%ld].material.name = %s\n", i, shapes[i].material.name.c_str());
         printf("  material.Ka = (%f, %f ,%f)\n", shapes[i].material.ambient[0], shapes[i].material.ambient[1], shapes[i].material.ambient[2]);
@@ -100,6 +106,22 @@ std::vector<float> Shapodino::getMesh() {
     return vtxPositions;
 }
 
+std::vector<float> Shapodino::getUvs() {
+    // Finderino all UVdinito's
+    std::vector<float> uvCoords;
+    for (size_t i = 0; i < shapes.size(); ++i) {
+        for (size_t f = 0; f < shapes[i].mesh.indices.size(); ++f) {
+            uvCoords.push_back(shapes[i].mesh.texcoords[
+                shapes[i].mesh.indices[f] * 2
+            ]);
+            uvCoords.push_back(shapes[i].mesh.texcoords[
+                (shapes[i].mesh.indices[f] * 2) + 1
+            ]);
+        }
+    }
+    return uvCoords;
+}
+
 Shapodino::~Shapodino() {
 
 }
@@ -112,7 +134,7 @@ Camerino::Camerino() {
     projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
     // Camera matrix
     view = glm::lookAt(
-        glm::vec3(0,5,5), // Camera is at (4,3,3), in World Space
+        glm::vec3(3,3,3), // Camera is at (4,3,3), in World Space
         glm::vec3(0,0,0), // and looks at the origin
         glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
     );

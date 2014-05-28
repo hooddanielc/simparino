@@ -1,5 +1,6 @@
 #include "apperino.h"
 #include "worldowrino.h"
+#include "texturino.h"
 
 class MyWindow : public Windowrino {
 public:
@@ -55,8 +56,8 @@ int main(int argc, char *argv[]) {
 
     // Load a teapot shape
     Shapodino teapot(
-        "res/blender_projects/textured_cube.obj",
-        "res/blender_projects/"
+        "res/test_objs/textured_cube.obj",
+        "res/test_objs/"
     );
 
     // Compile a shader
@@ -70,8 +71,12 @@ int main(int argc, char *argv[]) {
     GLuint MatrixID = glGetUniformLocation(shader.id, "MVP");
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(camera.mvp));
 
+    // Get a handle for our "myTextureSampler" uniform
+    GLuint textureunit  = glGetUniformLocation(shader.id, "myTextureSampler");
+
     // Create a bufferino to feed data to shaderino
     auto positions = teapot.getMesh();
+    auto uvs = teapot.getUvs();
     teapot.printToConsole();
     Bufferino buffer;
 
@@ -85,10 +90,37 @@ int main(int argc, char *argv[]) {
     buffer.addBuffer(0, positions.data(), positions.size() * 4);
     // in vec3 vertexColor
     buffer.addBuffer(1, colors.data(), colors.size() * 4);
+
+    Texturino tex("res/img/test-texture.png");
+    GLuint texture = tex.getTexture();
+    
+    // manually deal with uv coords
+    GLuint uvbo;
+    glGenBuffers(1, &uvbo);
+    glBindBuffer(GL_ARRAY_BUFFER, uvbo);
+    glBufferData(GL_ARRAY_BUFFER, uvs.size() * 4, uvs.data(), GL_STATIC_DRAW);
+
     buffer.enable();
 
+    // bind uv coords to layout=0
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, uvbo);
+    glVertexAttribPointer(
+       2,                  // number must match the layout in the shader
+       2,                  // size
+       GL_FLOAT,           // type
+       GL_FALSE,           // normalized?
+       0,                  // stride
+       (void*)0            // array buffer offset
+    );
+
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // set texture unit to 0
+    glUniform1i(textureunit, 0);
+
     // Initiate draw func
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearColor(0.5, 0.5, 1.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     glDrawArrays(GL_TRIANGLES, 0, positions.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle

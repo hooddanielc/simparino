@@ -42,6 +42,7 @@ public:
     void printToConsole();
     std::vector<tinyobj::shape_t> shapes;
     std::vector<float> getMesh();
+    std::vector<float> getUvs();
 };
 
 class Bufferino {

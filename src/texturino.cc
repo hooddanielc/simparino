@@ -7,5 +7,14 @@ using namespace Magick;
 * * * * * * * * * * * * * * * * * * * * */
 Texturino::Texturino(const char *fname) : img(fname) {
     img.write(&blob, "RGBA");
-    //glTexImage2D(m_textureTarget, 0, GL_RGBA, img.columns(), img.rows(), 0, GL_RGBA, GL_UNSIGNED_BYTE, blob.data());
+}
+
+GLuint Texturino::getTexture() {
+    GLuint tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.columns(), img.rows(), 0, GL_RGBA, GL_UNSIGNED_BYTE, blob.data());
+    return tex;
 }
