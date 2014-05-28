@@ -54,7 +54,10 @@ int main(int argc, char *argv[]) {
     Camerino camera;
 
     // Load a teapot shape
-    Shapodino teapot("res/test_objs/teapot.obj");
+    Shapodino teapot(
+        "res/blender_projects/textured_cube.obj",
+        "res/blender_projects/"
+    );
 
     // Compile a shader
     Shaderino shader;
@@ -69,6 +72,7 @@ int main(int argc, char *argv[]) {
 
     // Create a bufferino to feed data to shaderino
     auto positions = teapot.getMesh();
+    teapot.printToConsole();
     Bufferino buffer;
 
     std::vector<float> colors;

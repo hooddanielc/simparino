@@ -37,7 +37,7 @@ public:
 
 class Shapodino {
 public:
-    Shapodino(const char *fname);
+    Shapodino(const char *objfile, const char *mtlfile);
     ~Shapodino();
     void printToConsole();
     std::vector<tinyobj::shape_t> shapes;

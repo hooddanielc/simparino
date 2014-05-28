@@ -38,8 +38,8 @@ Worldowrino::~Worldowrino() {
 * Responsible for parsing
 * and drawing object
 * * * * * */
-Shapodino::Shapodino(const char *objfile) {
-    std::string err = tinyobj::LoadObj(shapes, objfile);
+Shapodino::Shapodino(const char *objfile, const char *mtlfile) {
+    std::string err = tinyobj::LoadObj(shapes, objfile, mtlfile);
 }
 
 void Shapodino::printToConsole() {
