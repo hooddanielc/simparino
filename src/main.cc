@@ -1,6 +1,7 @@
 #include "apperino.h"
 #include "worldowrino.h"
 #include "texturino.h"
+#include "bufferino.h"
 
 class MyWindow : public Windowrino {
 public:

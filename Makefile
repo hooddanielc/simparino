@@ -1,5 +1,5 @@
 release: src/main.cc src/apperino.cc
-	g++ -Ilib -I/opt/local/include/GraphicsMagick -std=c++11 -o simparino src/main.cc src/apperino.cc src/worldowrino.cc src/texturino.cc lib/tinyobjloader/tiny_obj_loader.cc \
+	g++ -Ilib -I/opt/local/include/GraphicsMagick -std=c++11 -o simparino src/main.cc src/apperino.cc src/worldowrino.cc src/texturino.cc src/bufferino.cc lib/tinyobjloader/tiny_obj_loader.cc \
 		-F /Library/Frameworks \
 		-framework SDL2 \
 		-framework OpenGL \

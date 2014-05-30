@@ -45,17 +45,6 @@ public:
     std::vector<float> getUvs();
 };
 
-class Bufferino {
-public:
-    GLuint vao;
-    std::map<int, GLuint> vbos;
-    void addBuffer(int idx, GLfloat *data, int size);
-    void enable();
-    void disable();
-    Bufferino();
-    ~Bufferino();
-};
-
 class Shaderino {
 public:
     Shaderino();
