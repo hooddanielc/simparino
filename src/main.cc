@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
     glUniform1i(textureunit, 0);
 
     // Create a bufferino to feed data to shaderino
-    Bufferino buffer;
+    BufferSequerino buffer;
     // in vec3 vertexPosition_modelspace; = posisitions.data()
     buffer.addBuffer(0, positions.data(), positions.size() * 4);
     // in vec3 vertexColor

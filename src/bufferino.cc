@@ -4,12 +4,12 @@
 * For managing a Vertex Array Object
 * with many Vertex Buffer Objects
 * * * * * * * * * * * * * * * * * */
-Bufferino::Bufferino() {
+BufferSequerino::BufferSequerino() {
     // generate a vertex array object
     glGenVertexArrays(1, &vao);
 }
 
-void Bufferino::addBuffer(int idx, GLfloat *data, int size) {
+void BufferSequerino::addBuffer(int idx, GLfloat *data, int size) {
     glBindVertexArray(vao);
     GLuint vbo;
     glGenBuffers(1, &vbo);
@@ -18,7 +18,7 @@ void Bufferino::addBuffer(int idx, GLfloat *data, int size) {
     vbos[idx] = vbo;
 }
 
-void Bufferino::enable() {
+void BufferSequerino::enable() {
     for(auto it = vbos.begin(); it != vbos.end(); ++it) {
         glEnableVertexAttribArray(it->first);
         glBindBuffer(GL_ARRAY_BUFFER, it->second);
@@ -33,13 +33,13 @@ void Bufferino::enable() {
     }
 }
 
-void Bufferino::disable() {
+void BufferSequerino::disable() {
     for(auto it = vbos.begin(); it != vbos.end(); ++it) {
         glDisableVertexAttribArray(it->first);
     }
 }
 
-Bufferino::~Bufferino() {
+BufferSequerino::~BufferSequerino() {
     // delete vertex array object
     glDeleteVertexArrays(1, &vao);
     // delete shaders
