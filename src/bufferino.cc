@@ -9,7 +9,7 @@ BufferSequerino::BufferSequerino() {
     glGenVertexArrays(1, &vao);
 }
 
-void BufferSequerino::pushBuffer(std::shared_ptr<AnyBufferino> &buff) {
+void BufferSequerino::pushBuffer(std::shared_ptr<AnyBufferino> buff) {
     vbos.push_back(buff);
 }
 
@@ -41,32 +41,9 @@ void BufferSequerino::build() {
 
 void BufferSequerino::bind() {
     glBindVertexArray(vao);
-}
-
-
-
-void BufferSequerino::addBuffer(int idx, GLfloat *data, int size) {
-    glBindVertexArray(vao);
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-    somevbos[idx] = vbo;
-}
-
-void BufferSequerino::enable() {
-    glBindVertexArray(vao);
-    for(auto it = somevbos.begin(); it != somevbos.end(); ++it) {
-        glEnableVertexAttribArray(it->first);
-        glBindBuffer(GL_ARRAY_BUFFER, it->second);
-        glVertexAttribPointer(
-           it->first,          // number must match the layout in the shader
-           3,                  // size
-           GL_FLOAT,           // type
-           GL_FALSE,           // normalized?
-           0,                  // stride
-           (void*)0            // array buffer offset
-        );
+    for(auto it = tbos.begin(); it != tbos.end(); ++it) {
+        glActiveTexture(it->first);
+        glBindTexture(GL_TEXTURE_2D, it->second);
     }
 }
 

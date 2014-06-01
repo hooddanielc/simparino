@@ -16,5 +16,6 @@ GLuint Texturino::getTexture() {
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.columns(), img.rows(), 0, GL_RGBA, GL_UNSIGNED_BYTE, blob.data());
+    glGenTextures(0, &tex);
     return tex;
 }

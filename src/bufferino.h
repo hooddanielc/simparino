@@ -3,6 +3,8 @@
 #include <vector>
 #include <map>
 #include <GL/glew.h>
+#include <iostream>
+#include <string>
 
 class AnyBufferino {
 public:
@@ -18,6 +20,8 @@ public:
     Bufferino(std::vector<T> &&newData, size_t newColumns)
         : data(std::move(newData)), columns(newColumns) {
         glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, getSize(), data.data(), GL_STATIC_DRAW);
     }
     virtual ~Bufferino() {
         glDeleteBuffers(1, &vbo);
@@ -43,20 +47,16 @@ private:
 };
 
 template <typename T>
-std::shared_ptr<Bufferino<T>> MakeBufferino(std::vector<T> &&data, size_t columns) {
+std::shared_ptr<AnyBufferino> MakeBufferino(std::vector<T> &&data, size_t columns) {
     return std::make_shared<Bufferino<T>>(std::move(data), columns);
 }
 
 class BufferSequerino {
 public:
-    void pushBuffer(std::shared_ptr<AnyBufferino> &buff);
+    void pushBuffer(std::shared_ptr<AnyBufferino> buff);
     void pushTexture(GLenum textureUnit, GLuint textureId);
     void bind();
     void build();
-
-    void addBuffer(int idx, GLfloat *data, int size);
-    void enable();
-    void disable();
     BufferSequerino();
     ~BufferSequerino();
 private:

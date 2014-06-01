@@ -46,21 +46,6 @@ int main(int argc, char *argv[]) {
     // create a "camera"
     Camerino camera;
 
-    // Load a teapot shape
-    Shapodino teapot(
-        "res/test_objs/textured_cube.obj",
-        "res/test_objs/"
-    );
-
-    // get some coordinates from our .obj file
-    auto positions = teapot.getMesh();
-    auto uvs = teapot.getUvs();
-    // Generate random colors
-    std::vector<float> colors;
-    for(auto i = 0; i < positions.size(); ++i) {
-        colors.push_back((float) rand() / RAND_MAX);
-    }
-
     // Compile a shader
     Shaderino shader;
     shader.compile("shaders/test.vs", GL_VERTEX_SHADER);
@@ -73,49 +58,63 @@ int main(int argc, char *argv[]) {
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(camera.mvp));
 
     // Get "myTextureSampler" uniform
-    GLuint textureunit  = glGetUniformLocation(shader.id, "myTextureSampler");
+    GLuint textureunit  = glGetUniformLocation(shader.id, "texture0");
     glUniform1i(textureunit, 0);
 
-    // Create a bufferino to feed data to shaderino
-    BufferSequerino buffer;
-    // in vec3 vertexPosition_modelspace; = posisitions.data()
-    buffer.addBuffer(0, positions.data(), positions.size() * 4);
-    // in vec3 vertexColor
-    buffer.addBuffer(1, colors.data(), colors.size() * 4);
-
-    // manually generate a texture
-    Texturino tex("res/img/test-texture.png");
-    GLuint texture = tex.getTexture();
-    GLuint uvbo;
-    glGenBuffers(1, &uvbo);
-    glBindBuffer(GL_ARRAY_BUFFER, uvbo);
-    glBufferData(GL_ARRAY_BUFFER, uvs.size() * 4, uvs.data(), GL_STATIC_DRAW);
-
-    // enable our bufferino as well
-    buffer.enable();
-
-    // bind uv coords to layout=0
-    glEnableVertexAttribArray(2);
-    glBindBuffer(GL_ARRAY_BUFFER, uvbo);
-    glVertexAttribPointer(
-       2,                  // number must match the layout in the shader
-       2,                  // size
-       GL_FLOAT,           // type
-       GL_FALSE,           // normalized?
-       0,                  // stride
-       (void*)0            // array buffer offset
+    // create textured cube buffers
+    Shapodino textured_cube(
+        "res/test_objs/textured_cube.obj",
+        "res/test_objs/"
     );
+    auto texture_cub_size = textured_cube.getMesh().size();
+    Texturino test_texture_debug("res/img/test-texture.png");
 
-    // enable our texture
-    glBindTexture(GL_TEXTURE_2D, texture);
+    // create textured psychedelic plane buffers
+    Shapodino textured_plane(
+        "res/test_objs/psychedelic_plane.obj",
+        "res/test_objs/"
+    );
+    auto textured_plane_size = textured_plane.getMesh().size();
+    Texturino test_texture_psychedelic("res/img/psychedelic.png");
 
-    // clear background color
-    // light purple
+    // create a psychedelic cube sequence
+    BufferSequerino buffer_sequence_cube;
+    buffer_sequence_cube.pushBuffer(MakeBufferino(
+        textured_cube.getMesh(),
+        3
+    ));
+    buffer_sequence_cube.pushBuffer(MakeBufferino(
+        textured_cube.getUvs(),
+        2
+    ));
+    buffer_sequence_cube.pushTexture(GL_TEXTURE0, test_texture_debug.getTexture());
+    buffer_sequence_cube.build();
+
+    // create psychedelic plane sequence
+    BufferSequerino buffer_sequence_plane;
+    buffer_sequence_plane.pushBuffer(MakeBufferino(
+        textured_plane.getMesh(),
+        3
+    ));
+    buffer_sequence_plane.pushBuffer(MakeBufferino(
+        textured_plane.getUvs(),
+        2
+    ));
+    buffer_sequence_plane.pushTexture(GL_TEXTURE0, test_texture_psychedelic.getTexture());
+    buffer_sequence_plane.build();
+
     glClearColor(0.5, 0.5, 1.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    // draw vao
-    glDrawArrays(GL_TRIANGLES, 0, positions.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
+
+    // Draw our psychedelic_cube buffer sequence
+    buffer_sequence_cube.bind();
+    glDrawArrays(GL_TRIANGLES, 0, texture_cub_size);
+
+    // draw our psychedelic_plane buffer sequence
+    buffer_sequence_plane.bind();
+    glDrawArrays(GL_TRIANGLES, 0, textured_plane_size);
+
+    // swap buffers
     win1->swap();
 
     app.on(SDL_KEYDOWN, [](const SDL_Event &event) {
@@ -130,16 +129,6 @@ int main(int argc, char *argv[]) {
 
     app.on(SDL_QUIT, [](const SDL_Event &event) {
         Apperino::get()->quit();
-    });
-
-    win1->on(SDL_KEYDOWN, [&positions, &buffer](std::shared_ptr<Windowrino> win, const SDL_Event &event) {
-        win->makeCurrentCtx();
-        glClearColor(0.5, 0.5, 0.5, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        buffer.bind();
-        // draw vao
-        glDrawArrays(GL_TRIANGLES, 0, positions.size()); 
-        win->swap();
     });
 
     app.run();
