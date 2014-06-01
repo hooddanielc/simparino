@@ -40,13 +40,6 @@ int main(int argc, char *argv[]) {
 
     app.addWindow(win1);
 
-    win1->on(SDL_KEYDOWN, [](std::shared_ptr<Windowrino> win, const SDL_Event &event) {
-        win->makeCurrentCtx();
-        glClearColor(0.0, 0.0, 0.0, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT);
-        win->swap();
-    });
-
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
 
@@ -123,8 +116,6 @@ int main(int argc, char *argv[]) {
     
     // draw vao
     glDrawArrays(GL_TRIANGLES, 0, positions.size()); // Starting from vertex 0; 3 vertices total -> 1 triangle
-    
-    buffer.disable();
     win1->swap();
 
     app.on(SDL_KEYDOWN, [](const SDL_Event &event) {
@@ -139,6 +130,16 @@ int main(int argc, char *argv[]) {
 
     app.on(SDL_QUIT, [](const SDL_Event &event) {
         Apperino::get()->quit();
+    });
+
+    win1->on(SDL_KEYDOWN, [&positions, &buffer](std::shared_ptr<Windowrino> win, const SDL_Event &event) {
+        win->makeCurrentCtx();
+        glClearColor(0.5, 0.5, 0.5, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        buffer.bind();
+        // draw vao
+        glDrawArrays(GL_TRIANGLES, 0, positions.size()); 
+        win->swap();
     });
 
     app.run();

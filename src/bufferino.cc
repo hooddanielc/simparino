@@ -9,17 +9,54 @@ BufferSequerino::BufferSequerino() {
     glGenVertexArrays(1, &vao);
 }
 
+void BufferSequerino::pushBuffer(std::shared_ptr<AnyBufferino> &buff) {
+    vbos.push_back(buff);
+}
+
+void BufferSequerino::pushTexture(GLenum textureUnit, GLuint textureId) {
+    tbos[textureUnit] = textureId;
+}
+
+void BufferSequerino::build() {
+    glBindVertexArray(vao);
+    int idx = 0;
+    for(auto it = vbos.begin(); it != vbos.end(); ++it, ++idx) {
+        glEnableVertexAttribArray(idx);
+        glBindBuffer(GL_ARRAY_BUFFER, (*it)->getId());
+        glVertexAttribPointer(
+           idx,
+           (*it)->getColumns(),
+           GL_FLOAT,
+           GL_FALSE,
+           0,
+           (void*)0
+        );
+    }
+    for(auto it = tbos.begin(); it != tbos.end(); ++it) {
+        glActiveTexture(it->first);
+        glBindTexture(GL_TEXTURE_2D, it->second);
+    }
+    glBindVertexArray(0);
+}
+
+void BufferSequerino::bind() {
+    glBindVertexArray(vao);
+}
+
+
+
 void BufferSequerino::addBuffer(int idx, GLfloat *data, int size) {
     glBindVertexArray(vao);
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-    vbos[idx] = vbo;
+    somevbos[idx] = vbo;
 }
 
 void BufferSequerino::enable() {
-    for(auto it = vbos.begin(); it != vbos.end(); ++it) {
+    glBindVertexArray(vao);
+    for(auto it = somevbos.begin(); it != somevbos.end(); ++it) {
         glEnableVertexAttribArray(it->first);
         glBindBuffer(GL_ARRAY_BUFFER, it->second);
         glVertexAttribPointer(
@@ -33,17 +70,11 @@ void BufferSequerino::enable() {
     }
 }
 
-void BufferSequerino::disable() {
-    for(auto it = vbos.begin(); it != vbos.end(); ++it) {
-        glDisableVertexAttribArray(it->first);
-    }
-}
-
 BufferSequerino::~BufferSequerino() {
     // delete vertex array object
     glDeleteVertexArrays(1, &vao);
-    // delete shaders
-    for(auto it = vbos.begin(); it != vbos.end(); ++it) {
+    // delete buffers
+    for(auto it = somevbos.begin(); it != somevbos.end(); ++it) {
         glDeleteBuffers(1, &it->second);
     }
 }

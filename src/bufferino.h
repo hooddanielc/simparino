@@ -7,6 +7,8 @@
 class AnyBufferino {
 public:
     virtual size_t getSize() const = 0;
+    virtual size_t getColumns() const = 0;
+    virtual GLuint getId() const = 0;
     virtual ~AnyBufferino(){}
 };
 
@@ -25,6 +27,12 @@ public:
         glBufferData(GL_ARRAY_BUFFER, getSize(), newData.data(), GL_STATIC_DRAW);
         data = std::move(newData);
     }
+    virtual GLuint getId() const override {
+        return vbo;
+    }
+    virtual size_t getColumns() const override {
+        return columns;
+    }
     virtual size_t getSize() const override {
         return sizeof(T) * data.size();
     }
@@ -41,13 +49,19 @@ std::shared_ptr<Bufferino<T>> MakeBufferino(std::vector<T> &&data, size_t column
 
 class BufferSequerino {
 public:
-    GLuint vao;
     void pushBuffer(std::shared_ptr<AnyBufferino> &buff);
+    void pushTexture(GLenum textureUnit, GLuint textureId);
+    void bind();
+    void build();
+
     void addBuffer(int idx, GLfloat *data, int size);
     void enable();
     void disable();
     BufferSequerino();
     ~BufferSequerino();
 private:
-    std::map<int, GLuint> vbos;
+    std::map<GLuint, GLuint> somevbos;
+    std::vector<std::shared_ptr<AnyBufferino>> vbos;
+    std::map<GLenum, GLuint> tbos;
+    GLuint vao;
 };
