@@ -1,6 +1,5 @@
 #include "apperino.h"
 #include "worldowrino.h"
-#include "texturino.h"
 #include "bufferino.h"
 
 class MyWindow : public Windowrino {
@@ -18,7 +17,9 @@ public:
         w,
         h,
         flags
-    ){}
+    ){
+        
+    }
     void loop(double time) {
         //std::cout << "the time is: " << time << std::endl;
     }
@@ -62,20 +63,21 @@ int main(int argc, char *argv[]) {
     glUniform1i(textureunit, 0);
 
     // create textured cube buffers
-    Shapodino textured_cube(
+    ShapodinoBuilder textured_cube(
         "res/test_objs/textured_cube.obj",
         "res/test_objs/"
     );
     auto texture_cub_size = textured_cube.getMesh().size();
-    Texturino test_texture_debug("res/img/test-texture.png");
+    TextureBufferino test_texture_debug("res/img/test-texture.png");
 
     // create textured psychedelic plane buffers
-    Shapodino textured_plane(
+    ShapodinoBuilder textured_plane(
         "res/test_objs/psychedelic_plane.obj",
         "res/test_objs/"
     );
     auto textured_plane_size = textured_plane.getMesh().size();
-    Texturino test_texture_psychedelic("res/img/psychedelic.png");
+    TextureBufferino test_texture_psychedelic("res/img/psychedelic.png");
+    textured_plane.printToConsole();
 
     // create a psychedelic cube sequence
     BufferSequerino buffer_sequence_cube;
@@ -87,7 +89,7 @@ int main(int argc, char *argv[]) {
         textured_cube.getUvs(),
         2
     ));
-    buffer_sequence_cube.pushTexture(GL_TEXTURE0, test_texture_debug.getTexture());
+    buffer_sequence_cube.pushTexture(GL_TEXTURE0, test_texture_debug.getId());
     buffer_sequence_cube.build();
 
     // create psychedelic plane sequence
@@ -100,7 +102,7 @@ int main(int argc, char *argv[]) {
         textured_plane.getUvs(),
         2
     ));
-    buffer_sequence_plane.pushTexture(GL_TEXTURE0, test_texture_psychedelic.getTexture());
+    buffer_sequence_plane.pushTexture(GL_TEXTURE0, test_texture_psychedelic.getId());
     buffer_sequence_plane.build();
 
     glClearColor(0.5, 0.5, 1.0, 1.0);

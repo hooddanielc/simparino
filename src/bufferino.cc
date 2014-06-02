@@ -55,3 +55,26 @@ BufferSequerino::~BufferSequerino() {
         glDeleteBuffers(1, &it->second);
     }
 }
+
+/*
+* Helper class making opengl texturino's
+* * * * * * * * * * * * * * * * * * * * */
+TextureBufferino::TextureBufferino(const char *fname) {
+    Magick::Image image(fname);
+    image.write(&blob, "RGBA");
+    glGenTextures(1, &textureId);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.columns(), image.rows(), 0, GL_RGBA, GL_UNSIGNED_BYTE, blob.data());
+}
+
+GLuint TextureBufferino::getId() {
+    return textureId;
+}
+
+TextureBufferino::~TextureBufferino() {
+    glDeleteTextures(1, &textureId);
+}
+
+std::shared_ptr<TextureBufferino> MakeTextureBufferino(const char *fname);

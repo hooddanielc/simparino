@@ -5,6 +5,7 @@
 #include <GL/glew.h>
 #include <iostream>
 #include <string>
+#include "Magick++.h"
 
 class AnyBufferino {
 public:
@@ -65,3 +66,15 @@ private:
     std::map<GLenum, GLuint> tbos;
     GLuint vao;
 };
+
+class TextureBufferino {
+public:
+    Magick::Blob blob;
+    TextureBufferino(const char *fname);
+    ~TextureBufferino();
+    GLuint getId();
+private:
+    GLuint textureId;
+};
+
+std::shared_ptr<TextureBufferino> MakeTextureBufferino(const char *fname);

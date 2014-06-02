@@ -12,6 +12,7 @@ Worldowrino::Worldowrino() {
     // The world.
     dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher,broadphase,solver,collisionConfiguration);
     dynamicsWorld->setGravity(btVector3(0,-10,0));
+    
     // adding a collision shape
     btCollisionShape* shape = new btStaticPlaneShape(btVector3(0, 1, 0), 1);
     btDefaultMotionState* motionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,-1,0)));
@@ -22,6 +23,7 @@ Worldowrino::Worldowrino() {
         btVector3(0,0,0)    // local inertia
     );
     btRigidBody *rigidBody = new btRigidBody(rigidBodyCI);
+
     dynamicsWorld->addRigidBody(rigidBody);
 }
 
@@ -35,14 +37,36 @@ Worldowrino::~Worldowrino() {
 }
 
 /*
-* Responsible for parsing
-* and drawing object
-* * * * * */
-Shapodino::Shapodino(const char *objfile, const char *mtlfile) {
-    std::string err = tinyobj::LoadObj(shapes, objfile, mtlfile);
+* Represents a shape in our
+* 3D world. Responsible for
+* actually drawing a shape
+* at a specific position
+* * * * * * * * * * * * * */
+void Shapodino::pushBufferSequence(size_t arrayLength, BufferSequerino bufferSequence) {
+    bufferinos[arrayLength] = bufferSequence;
 }
 
-void Shapodino::printToConsole() {
+void Shapodino::draw() {
+    for(auto it = bufferinos.begin(); it != bufferinos.end(); ++it) {
+        it->second.bind();
+        glDrawArrays(GL_TRIANGLES, 0, it->first);
+    }
+}
+
+/*
+* Responsible for parsing
+* an obj file and creating
+* a Shapodino for drawing
+* * * * * * * * * * * * * */
+ShapodinoBuilder::ShapodinoBuilder(const char *objfile, const char *mtlfile) {
+    std::string err = tinyobj::LoadObj(shapes, objfile, mtlfile);
+    if(err.length()) {
+        std::cout << "Shapodino Error: " << err << std::endl;
+        assert(err.length() == 0);
+    }
+}
+
+void ShapodinoBuilder::printToConsole() {
     std::cout << "# of shapes : " << shapes.size() << std::endl;
     for (size_t i = 0; i < shapes.size(); i++) {
         printf("shape[%ld].name = %s\n", i, shapes[i].name.c_str());
@@ -86,7 +110,7 @@ void Shapodino::printToConsole() {
     }
 }
 
-std::vector<float> Shapodino::getMesh() {
+std::vector<float> ShapodinoBuilder::getMesh() {
     // Cound all indices
     std::vector<float> vtxPositions;
     unsigned count = 0;
@@ -106,7 +130,7 @@ std::vector<float> Shapodino::getMesh() {
     return vtxPositions;
 }
 
-std::vector<float> Shapodino::getUvs() {
+std::vector<float> ShapodinoBuilder::getUvs() {
     // Finderino all UVdinito's
     std::vector<float> uvCoords;
     for (size_t i = 0; i < shapes.size(); ++i) {
@@ -120,10 +144,6 @@ std::vector<float> Shapodino::getUvs() {
         }
     }
     return uvCoords;
-}
-
-Shapodino::~Shapodino() {
-
 }
 
 /*
@@ -142,10 +162,6 @@ Camerino::Camerino() {
     model = glm::mat4(1.0f); // Changes for each model !
     // Our ModelViewProjection : multiplication of our 3 matrices
     mvp = projection * view * model; // Remember, matrix multiplication is the other way around
-}
-
-Camerino::~Camerino() {
-
 }
 
 /*
