@@ -13,8 +13,8 @@ void BufferSequerino::pushBuffer(std::shared_ptr<AnyBufferino> buff) {
     vbos.push_back(buff);
 }
 
-void BufferSequerino::pushTexture(GLenum textureUnit, GLuint textureId) {
-    tbos[textureUnit] = textureId;
+void BufferSequerino::pushTexture(GLenum textureUnit, std::shared_ptr<TextureBufferino> texture) {
+    tbos[textureUnit] = texture;
 }
 
 void BufferSequerino::build() {
@@ -34,7 +34,7 @@ void BufferSequerino::build() {
     }
     for(auto it = tbos.begin(); it != tbos.end(); ++it) {
         glActiveTexture(it->first);
-        glBindTexture(GL_TEXTURE_2D, it->second);
+        glBindTexture(GL_TEXTURE_2D, it->second->getId());
     }
     glBindVertexArray(0);
 }
@@ -43,23 +43,19 @@ void BufferSequerino::bind() {
     glBindVertexArray(vao);
     for(auto it = tbos.begin(); it != tbos.end(); ++it) {
         glActiveTexture(it->first);
-        glBindTexture(GL_TEXTURE_2D, it->second);
+        glBindTexture(GL_TEXTURE_2D, it->second->getId());
     }
 }
 
 BufferSequerino::~BufferSequerino() {
     // delete vertex array object
     glDeleteVertexArrays(1, &vao);
-    // delete buffers
-    for(auto it = somevbos.begin(); it != somevbos.end(); ++it) {
-        glDeleteBuffers(1, &it->second);
-    }
 }
 
 /*
 * Helper class making opengl texturino's
 * * * * * * * * * * * * * * * * * * * * */
-TextureBufferino::TextureBufferino(const char *fname) {
+TextureBufferino::TextureBufferino(const char *fname) : relativepath(fname) {
     Magick::Image image(fname);
     image.write(&blob, "RGBA");
     glGenTextures(1, &textureId);
@@ -77,4 +73,6 @@ TextureBufferino::~TextureBufferino() {
     glDeleteTextures(1, &textureId);
 }
 
-std::shared_ptr<TextureBufferino> MakeTextureBufferino(const char *fname);
+std::shared_ptr<TextureBufferino> MakeTextureBufferino(const char *fname) {
+    return std::make_shared<TextureBufferino>(fname);
+}

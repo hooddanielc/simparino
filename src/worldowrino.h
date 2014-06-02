@@ -38,8 +38,12 @@ public:
 };
 
 class Shapodino {
-    void pushBufferSequence(size_t arrayLength, BufferSequerino bufferinoSequence);
+public:
+    Shapodino() : modelMatrix(glm::mat4(1.0)) {}
+    void pushBufferSequence(size_t arrayLength, BufferSequerino &&bufferinoSequence);
     void draw();
+private:
+    glm::mat4 modelMatrix;
     std::map<size_t, BufferSequerino> bufferinos;
 };
 
@@ -48,8 +52,10 @@ public:
     ShapodinoBuilder(const char *objfile, const char *mtlfile);
     void printToConsole();
     std::vector<tinyobj::shape_t> shapes;
+    std::string mtldir;
     std::vector<float> getMesh();
     std::vector<float> getUvs();
+    std::shared_ptr<Shapodino> makeShapodino();
 };
 
 class Shaderino {

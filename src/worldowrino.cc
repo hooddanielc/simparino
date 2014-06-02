@@ -42,15 +42,15 @@ Worldowrino::~Worldowrino() {
 * actually drawing a shape
 * at a specific position
 * * * * * * * * * * * * * */
-void Shapodino::pushBufferSequence(size_t arrayLength, BufferSequerino bufferSequence) {
-    bufferinos[arrayLength] = bufferSequence;
+void Shapodino::pushBufferSequence(size_t arrayLength, BufferSequerino &&bufferSequence) {
+    bufferinos[arrayLength] = std::move(bufferSequence);
 }
 
 void Shapodino::draw() {
-    for(auto it = bufferinos.begin(); it != bufferinos.end(); ++it) {
-        it->second.bind();
-        glDrawArrays(GL_TRIANGLES, 0, it->first);
-    }
+    // for(auto it = bufferinos.begin(); it != bufferinos.end(); ++it) {
+    //     it->second.bind();
+    //     glDrawArrays(GL_TRIANGLES, 0, it->first);
+    // }
 }
 
 /*
@@ -58,7 +58,7 @@ void Shapodino::draw() {
 * an obj file and creating
 * a Shapodino for drawing
 * * * * * * * * * * * * * */
-ShapodinoBuilder::ShapodinoBuilder(const char *objfile, const char *mtlfile) {
+ShapodinoBuilder::ShapodinoBuilder(const char *objfile, const char *mtlfile) : mtldir(mtlfile) {
     std::string err = tinyobj::LoadObj(shapes, objfile, mtlfile);
     if(err.length()) {
         std::cout << "Shapodino Error: " << err << std::endl;
@@ -146,6 +146,48 @@ std::vector<float> ShapodinoBuilder::getUvs() {
     return uvCoords;
 }
 
+std::shared_ptr<Shapodino> ShapodinoBuilder::makeShapodino() {
+    std::shared_ptr<Shapodino> shape = std::make_shared<Shapodino>();
+    for(auto iterShape = shapes.begin(); iterShape < shapes.end(); ++iterShape) {
+        std::vector<float> vtxPositions;
+        std::vector<float> uvCoords;
+        for(auto iterIndices = *iterShape->mesh.indices.begin(); iterIndices < *iterShape->mesh.indices.end(); ++iterIndices) {
+            // gather vertex positions
+            vtxPositions.push_back((*iterShape).mesh.positions[
+                (iterIndices * 3)
+            ]);
+            vtxPositions.push_back((*iterShape).mesh.positions[
+                (iterIndices * 3) + 1
+            ]);
+            vtxPositions.push_back((*iterShape).mesh.positions[
+                (iterIndices * 3) + 2
+            ]);
+            // gather uv coordinates
+            uvCoords.push_back((*iterShape).mesh.texcoords[
+                iterIndices * 2
+            ]);
+            uvCoords.push_back((*iterShape).mesh.texcoords[
+                (iterIndices * 2) + 1
+            ]);
+        }
+        // create a bufferino for the vertex positions
+        BufferSequerino buffer_sequence;
+        buffer_sequence.pushBuffer(MakeBufferino(
+            std::move(vtxPositions),
+            3
+        ));
+        buffer_sequence.pushBuffer(MakeBufferino(
+            std::move(uvCoords),
+            2
+        ));
+        buffer_sequence.pushTexture(GL_TEXTURE0, MakeTextureBufferino(
+            (mtldir + (*iterShape).material.diffuse_texname).c_str()
+        ));
+        shape->pushBufferSequence((*iterShape).mesh.indices.size(), std::move(buffer_sequence));
+    }
+    return shape;
+}
+
 /*
 * Used for calculating the View matrix
 * * * * * * * * * * * * * * * * * * */
@@ -190,7 +232,6 @@ void Shaderino::compile(const char *filename, GLenum shaderType) {
         glGetShaderInfoLog(shaderid, infoLogLength, NULL, &shaderErrorMessage[0]);
         fprintf(stdout, "%s\n", &shaderErrorMessage[0]);
     }
-
     shaders.push_back(shaderid);
 }
 

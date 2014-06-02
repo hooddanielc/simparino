@@ -7,6 +7,19 @@
 #include <string>
 #include "Magick++.h"
 
+class TextureBufferino {
+public:
+    Magick::Blob blob;
+    TextureBufferino(const char *fname);
+    ~TextureBufferino();
+    GLuint getId();
+    std::string relativepath;
+private:
+    GLuint textureId;
+};
+
+std::shared_ptr<TextureBufferino> MakeTextureBufferino(const char *fname);
+
 class AnyBufferino {
 public:
     virtual size_t getSize() const = 0;
@@ -55,7 +68,7 @@ std::shared_ptr<AnyBufferino> MakeBufferino(std::vector<T> &&data, size_t column
 class BufferSequerino {
 public:
     void pushBuffer(std::shared_ptr<AnyBufferino> buff);
-    void pushTexture(GLenum textureUnit, GLuint textureId);
+    void pushTexture(GLenum textureUnit, std::shared_ptr<TextureBufferino> texture);
     void bind();
     void build();
     BufferSequerino();
@@ -63,18 +76,6 @@ public:
 private:
     std::map<GLuint, GLuint> somevbos;
     std::vector<std::shared_ptr<AnyBufferino>> vbos;
-    std::map<GLenum, GLuint> tbos;
+    std::map<GLenum, std::shared_ptr<TextureBufferino>> tbos;
     GLuint vao;
 };
-
-class TextureBufferino {
-public:
-    Magick::Blob blob;
-    TextureBufferino(const char *fname);
-    ~TextureBufferino();
-    GLuint getId();
-private:
-    GLuint textureId;
-};
-
-std::shared_ptr<TextureBufferino> MakeTextureBufferino(const char *fname);
