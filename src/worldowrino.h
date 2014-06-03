@@ -55,7 +55,7 @@ public:
     std::string mtldir;
     std::vector<float> getMesh();
     std::vector<float> getUvs();
-    std::shared_ptr<Shapodino> makeShapodino();
+    Shapodino makeShapodino();
 };
 
 class Shaderino {

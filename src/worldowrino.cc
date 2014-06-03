@@ -146,8 +146,8 @@ std::vector<float> ShapodinoBuilder::getUvs() {
     return uvCoords;
 }
 
-std::shared_ptr<Shapodino> ShapodinoBuilder::makeShapodino() {
-    std::shared_ptr<Shapodino> shape = std::make_shared<Shapodino>();
+Shapodino ShapodinoBuilder::makeShapodino() {
+    Shapodino shape;
     for(auto iterShape = shapes.begin(); iterShape < shapes.end(); ++iterShape) {
         std::vector<float> vtxPositions;
         std::vector<float> uvCoords;
@@ -184,7 +184,7 @@ std::shared_ptr<Shapodino> ShapodinoBuilder::makeShapodino() {
             (mtldir + (*iterShape).material.diffuse_texname).c_str()
         ));
         buffer_sequence->build();
-        shape->pushBufferSequence(buffer_sequence);
+        shape.pushBufferSequence(buffer_sequence);
     }
     return shape;
 }

@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     auto shape = texture_cube_builder.makeShapodino();
     glClearColor(0.5, 0.5, 1.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    shape->draw();
+    shape.draw();
 
     // swap buffers
     win1->swap();
