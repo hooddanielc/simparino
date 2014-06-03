@@ -42,16 +42,14 @@ Worldowrino::~Worldowrino() {
 * actually drawing a shape
 * at a specific position
 * * * * * * * * * * * * * */
-void Shapodino::pushBufferSequence(size_t arrayLength, BufferSequerino &&bufferSequence) {
-    bufferinos[arrayLength] = std::move(bufferSequence);
+void Shapodino::pushBufferSequence(std::shared_ptr<BufferSequerino> bufferSequence) {
+    bufferinos.push_back(bufferSequence);
 }
 
 void Shapodino::draw() {
     for(auto it = bufferinos.begin(); it != bufferinos.end(); ++it) {
-        std::cout << "DRAWING" << std::endl;
-        std::cout << it->first << std::endl;
-        it->second.bind();
-        glDrawArrays(GL_TRIANGLES, 0, it->first);
+        (*it)->bind();
+        glDrawArrays(GL_TRIANGLES, 0, (*it)->getIndices());
     }
 }
 
@@ -154,9 +152,6 @@ std::shared_ptr<Shapodino> ShapodinoBuilder::makeShapodino() {
         std::vector<float> vtxPositions;
         std::vector<float> uvCoords;
         for(auto iterIndices = (*iterShape).mesh.indices.begin(); iterIndices < (*iterShape).mesh.indices.end(); ++iterIndices) {
-            
-            std::cout << (*iterIndices) << std::endl;
-
             // gather vertex positions
             vtxPositions.push_back((*iterShape).mesh.positions[
                 ((*iterIndices) * 3)
@@ -176,20 +171,20 @@ std::shared_ptr<Shapodino> ShapodinoBuilder::makeShapodino() {
             ]);
         }
         // create a bufferino for the vertex positions
-        BufferSequerino buffer_sequence;
-        buffer_sequence.pushBuffer(MakeBufferino(
+        std::shared_ptr<BufferSequerino> buffer_sequence = std::make_shared<BufferSequerino>();
+        buffer_sequence->pushBuffer(MakeBufferino(
             std::move(vtxPositions),
             3
         ));
-        buffer_sequence.pushBuffer(MakeBufferino(
+        buffer_sequence->pushBuffer(MakeBufferino(
             std::move(uvCoords),
             2
         ));
-        buffer_sequence.pushTexture(GL_TEXTURE0, MakeTextureBufferino(
+        buffer_sequence->pushTexture(GL_TEXTURE0, MakeTextureBufferino(
             (mtldir + (*iterShape).material.diffuse_texname).c_str()
         ));
-        buffer_sequence.build();
-        shape->pushBufferSequence((*iterShape).mesh.indices.size(), std::move(buffer_sequence));
+        buffer_sequence->build();
+        shape->pushBufferSequence(buffer_sequence);
     }
     return shape;
 }

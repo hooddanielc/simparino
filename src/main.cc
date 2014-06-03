@@ -59,7 +59,6 @@ int main(int argc, char *argv[]) {
         "res/test_objs/"
     );
 
-
     // set "MVP" uniform
     GLuint MatrixID = glGetUniformLocation(shader.id, "MVP");
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(camera.mvp));
@@ -68,67 +67,11 @@ int main(int argc, char *argv[]) {
     GLuint textureunit  = glGetUniformLocation(shader.id, "texture0");
     glUniform1i(textureunit, 0);
 
-    // auto shape = texture_cube_builder.makeShapodino();
-    // glClearColor(0.5, 0.5, 1.0, 1.0);
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // shape->draw();
-
-    // // swap buffers
-    // win1->swap();
-
-    // create textured cube buffers
-    ShapodinoBuilder textured_cube(
-        "res/test_objs/textured_cube.obj",
-        "res/test_objs/"
-    );
-    auto texture_cub_size = textured_cube.getMesh().size();
-    auto test_texture_debug = MakeTextureBufferino("res/img/test-texture.png");
-
-    // create textured psychedelic plane buffers
-    ShapodinoBuilder textured_plane(
-        "res/test_objs/psychedelic_plane.obj",
-        "res/test_objs/"
-    );
-    auto textured_plane_size = textured_plane.getMesh().size();
-    auto test_texture_psychedelic = MakeTextureBufferino("res/img/psychedelic.png");
-    textured_plane.printToConsole();
-
-    // create a psychedelic cube sequence
-    BufferSequerino buffer_sequence_cube;
-    buffer_sequence_cube.pushBuffer(MakeBufferino(
-        textured_cube.getMesh(),
-        3
-    ));
-    buffer_sequence_cube.pushBuffer(MakeBufferino(
-        textured_cube.getUvs(),
-        2
-    ));
-    buffer_sequence_cube.pushTexture(GL_TEXTURE0, test_texture_debug);
-    buffer_sequence_cube.build();
-
-    // create psychedelic plane sequence
-    BufferSequerino buffer_sequence_plane;
-    buffer_sequence_plane.pushBuffer(MakeBufferino(
-        textured_plane.getMesh(),
-        3
-    ));
-    buffer_sequence_plane.pushBuffer(MakeBufferino(
-        textured_plane.getUvs(),
-        2
-    ));
-    buffer_sequence_plane.pushTexture(GL_TEXTURE0, test_texture_psychedelic);
-    buffer_sequence_plane.build();
-
+    // make a shape and draw
+    auto shape = texture_cube_builder.makeShapodino();
     glClearColor(0.5, 0.5, 1.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Draw our psychedelic_cube buffer sequence
-    buffer_sequence_cube.bind();
-    glDrawArrays(GL_TRIANGLES, 0, texture_cub_size / 3);
-
-    // draw our psychedelic_plane buffer sequence
-    buffer_sequence_plane.bind();
-    glDrawArrays(GL_TRIANGLES, 0, textured_plane_size / 3);
+    shape->draw();
 
     // swap buffers
     win1->swap();

@@ -47,6 +47,13 @@ void BufferSequerino::bind() {
     }
 }
 
+size_t BufferSequerino::getIndices() {
+    if(vbos.size() > 0) {
+        return vbos[0]->getIndices();
+    }
+    return 0;
+}
+
 BufferSequerino::~BufferSequerino() {
     // delete vertex array object
     glDeleteVertexArrays(1, &vao);

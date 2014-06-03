@@ -40,11 +40,11 @@ public:
 class Shapodino {
 public:
     Shapodino() : modelMatrix(glm::mat4(1.0)) {}
-    void pushBufferSequence(size_t arrayLength, BufferSequerino &&bufferinoSequence);
+    void pushBufferSequence(std::shared_ptr<BufferSequerino> bufferinoSequence);
     void draw();
 private:
     glm::mat4 modelMatrix;
-    std::map<size_t, BufferSequerino> bufferinos;
+    std::vector<std::shared_ptr<BufferSequerino>> bufferinos;
 };
 
 class ShapodinoBuilder {

@@ -23,6 +23,7 @@ std::shared_ptr<TextureBufferino> MakeTextureBufferino(const char *fname);
 class AnyBufferino {
 public:
     virtual size_t getSize() const = 0;
+    virtual size_t getIndices() const = 0;
     virtual size_t getColumns() const = 0;
     virtual GLuint getId() const = 0;
     virtual ~AnyBufferino(){}
@@ -54,6 +55,9 @@ public:
     virtual size_t getSize() const override {
         return sizeof(T) * data.size();
     }
+    virtual size_t getIndices() const override {
+        return data.size() / columns;
+    }
 private:
     GLuint vbo;
     std::vector<T> data;
@@ -71,6 +75,7 @@ public:
     void pushTexture(GLenum textureUnit, std::shared_ptr<TextureBufferino> texture);
     void bind();
     void build();
+    size_t getIndices();
     BufferSequerino();
     ~BufferSequerino();
 private:
