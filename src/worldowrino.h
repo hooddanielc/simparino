@@ -31,8 +31,6 @@ public:
     void printToConsole();
     std::vector<tinyobj::shape_t> shapes;
     std::string mtldir;
-    std::vector<float> getMesh();
-    std::vector<float> getUvs();
     Shapodino makeShapodino();
 };
 

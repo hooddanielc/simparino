@@ -114,42 +114,6 @@ void ShapodinoBuilder::printToConsole() {
     }
 }
 
-std::vector<float> ShapodinoBuilder::getMesh() {
-    // Cound all indices
-    std::vector<float> vtxPositions;
-    unsigned count = 0;
-    for (size_t i = 0; i < shapes.size(); ++i) {
-        for (size_t f = 0; f < shapes[i].mesh.indices.size(); ++f) {
-            vtxPositions.push_back(shapes[i].mesh.positions[
-                shapes[i].mesh.indices[f] * 3
-            ]);
-            vtxPositions.push_back(shapes[i].mesh.positions[
-                (shapes[i].mesh.indices[f] * 3) + 1
-            ]);
-            vtxPositions.push_back(shapes[i].mesh.positions[
-                (shapes[i].mesh.indices[f] * 3) + 2
-            ]);
-        }
-    }
-    return vtxPositions;
-}
-
-std::vector<float> ShapodinoBuilder::getUvs() {
-    // Finderino all UVdinito's
-    std::vector<float> uvCoords;
-    for (size_t i = 0; i < shapes.size(); ++i) {
-        for (size_t f = 0; f < shapes[i].mesh.indices.size(); ++f) {
-            uvCoords.push_back(shapes[i].mesh.texcoords[
-                shapes[i].mesh.indices[f] * 2
-            ]);
-            uvCoords.push_back(shapes[i].mesh.texcoords[
-                (shapes[i].mesh.indices[f] * 2) + 1
-            ]);
-        }
-    }
-    return uvCoords;
-}
-
 Shapodino ShapodinoBuilder::makeShapodino() {
     Shapodino shape;
     for(auto iterShape = shapes.begin(); iterShape < shapes.end(); ++iterShape) {
