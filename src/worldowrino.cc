@@ -215,10 +215,26 @@ Shaderino::Shaderino() {
     id = glCreateProgram();
 }
 
+std::string Shaderino::readfile(const char *path) {
+    std::string thepath = "res/";
+    thepath += path;
+    std::string contents;
+    std::fstream fs;
+    fs.open(thepath);
+    if(fs.is_open()) {
+        std::string line;
+        while(std::getline(fs, line)) {
+            contents += line + "\n";
+        }
+        fs.close();
+    }
+    return contents;
+}
+
 void Shaderino::compile(const char *filename, GLenum shaderType) {
     GLuint shaderid = glCreateShader(shaderType);
     // compile shader
-    std::string thesource = Apperino::get()->readfile(filename);
+    std::string thesource = readfile(filename);
     const char *source = thesource.c_str();
     glShaderSource(shaderid, 1, &source, NULL);
     glCompileShader(shaderid);

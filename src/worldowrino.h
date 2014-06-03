@@ -65,6 +65,8 @@ public:
     void compile(const char* filename, GLenum shaderType);
     void link();
     void use();
-    std::vector<GLuint> shaders;
     GLuint id;
+private:
+    std::string readfile(const char *path);
+    std::vector<GLuint> shaders;
 };
