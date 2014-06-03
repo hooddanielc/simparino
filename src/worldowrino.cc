@@ -36,6 +36,10 @@ Worldowrino::~Worldowrino() {
     delete broadphase;
 }
 
+void Worldowrino::draw(const char *shaderName) {
+    shaderinos[shaderName]->use();
+}
+
 /*
 * Represents a shape in our
 * 3D world. Responsible for

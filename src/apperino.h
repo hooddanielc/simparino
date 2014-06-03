@@ -1,5 +1,7 @@
 #pragma once
 
+#include "worldowrino.h"
+
 #include <vector>
 #include <iostream>
 #include <map>
@@ -43,6 +45,8 @@ public:
 private:
     SDL_Window *win;
     SDL_GLContext ctx;
+protected:
+    Worldowrino worldowrino;
 };
 
 class Apperino {
