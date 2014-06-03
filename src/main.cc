@@ -54,6 +54,12 @@ int main(int argc, char *argv[]) {
     shader.link();
     shader.use();
 
+    ShapodinoBuilder texture_cube_builder(
+        "res/test_objs/textured_cube.obj",
+        "res/test_objs/"
+    );
+
+
     // set "MVP" uniform
     GLuint MatrixID = glGetUniformLocation(shader.id, "MVP");
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(camera.mvp));
@@ -61,6 +67,14 @@ int main(int argc, char *argv[]) {
     // Get "myTextureSampler" uniform
     GLuint textureunit  = glGetUniformLocation(shader.id, "texture0");
     glUniform1i(textureunit, 0);
+
+    // auto shape = texture_cube_builder.makeShapodino();
+    // glClearColor(0.5, 0.5, 1.0, 1.0);
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // shape->draw();
+
+    // // swap buffers
+    // win1->swap();
 
     // create textured cube buffers
     ShapodinoBuilder textured_cube(

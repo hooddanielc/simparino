@@ -47,10 +47,12 @@ void Shapodino::pushBufferSequence(size_t arrayLength, BufferSequerino &&bufferS
 }
 
 void Shapodino::draw() {
-    // for(auto it = bufferinos.begin(); it != bufferinos.end(); ++it) {
-    //     it->second.bind();
-    //     glDrawArrays(GL_TRIANGLES, 0, it->first);
-    // }
+    for(auto it = bufferinos.begin(); it != bufferinos.end(); ++it) {
+        std::cout << "DRAWING" << std::endl;
+        std::cout << it->first << std::endl;
+        it->second.bind();
+        glDrawArrays(GL_TRIANGLES, 0, it->first);
+    }
 }
 
 /*
@@ -151,23 +153,26 @@ std::shared_ptr<Shapodino> ShapodinoBuilder::makeShapodino() {
     for(auto iterShape = shapes.begin(); iterShape < shapes.end(); ++iterShape) {
         std::vector<float> vtxPositions;
         std::vector<float> uvCoords;
-        for(auto iterIndices = *iterShape->mesh.indices.begin(); iterIndices < *iterShape->mesh.indices.end(); ++iterIndices) {
+        for(auto iterIndices = (*iterShape).mesh.indices.begin(); iterIndices < (*iterShape).mesh.indices.end(); ++iterIndices) {
+            
+            std::cout << (*iterIndices) << std::endl;
+
             // gather vertex positions
             vtxPositions.push_back((*iterShape).mesh.positions[
-                (iterIndices * 3)
+                ((*iterIndices) * 3)
             ]);
             vtxPositions.push_back((*iterShape).mesh.positions[
-                (iterIndices * 3) + 1
+                ((*iterIndices) * 3) + 1
             ]);
             vtxPositions.push_back((*iterShape).mesh.positions[
-                (iterIndices * 3) + 2
+                ((*iterIndices) * 3) + 2
             ]);
             // gather uv coordinates
             uvCoords.push_back((*iterShape).mesh.texcoords[
-                iterIndices * 2
+                (*iterIndices) * 2
             ]);
             uvCoords.push_back((*iterShape).mesh.texcoords[
-                (iterIndices * 2) + 1
+                ((*iterIndices) * 2) + 1
             ]);
         }
         // create a bufferino for the vertex positions
@@ -183,6 +188,7 @@ std::shared_ptr<Shapodino> ShapodinoBuilder::makeShapodino() {
         buffer_sequence.pushTexture(GL_TEXTURE0, MakeTextureBufferino(
             (mtldir + (*iterShape).material.diffuse_texname).c_str()
         ));
+        buffer_sequence.build();
         shape->pushBufferSequence((*iterShape).mesh.indices.size(), std::move(buffer_sequence));
     }
     return shape;
