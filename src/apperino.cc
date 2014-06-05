@@ -132,6 +132,12 @@ Windowrino::Windowrino(
     glewExperimental = GL_TRUE;
     GLenum glew_error = glewInit();
     assert(!glew_error);
+    world.resize(w, h);
+    on(SDL_WINDOWEVENT, [](std::shared_ptr<Windowrino> win, const SDL_Event &event) {
+        if(event.window.event == SDL_WINDOWEVENT_RESIZED) {
+            win->world.resize(event.window.data1, event.window.data2);
+        }
+    });
 }
 
 void Windowrino::setPosition(int x, int y) {

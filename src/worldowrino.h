@@ -52,8 +52,10 @@ public:
     Worldowrino();
     ~Worldowrino();
     void draw(const char *shaderName);
+    void resize(float width, float height);
     std::map<std::string, std::shared_ptr<Shaderino>> shaderinos;
 private:
+    glm::mat4 projection;
     std::vector<Shapodino> shapodinos;
     btBroadphaseInterface *broadphase;
     btDefaultCollisionConfiguration *collisionConfiguration;

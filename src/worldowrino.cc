@@ -23,8 +23,12 @@ Worldowrino::Worldowrino() {
         btVector3(0,0,0)    // local inertia
     );
     btRigidBody *rigidBody = new btRigidBody(rigidBodyCI);
-
     dynamicsWorld->addRigidBody(rigidBody);
+}
+
+void Worldowrino::resize(float width, float height) {
+    std::cout << "resized: " << width / height << std::endl;
+    projection = glm::perspective(45.0f, width / height, 0.1f, 100.0f);
 }
 
 Worldowrino::~Worldowrino() {

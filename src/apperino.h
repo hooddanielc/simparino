@@ -42,6 +42,7 @@ public:
     void makeCurrentCtx();
     void on(Uint32 type, std::function<void (std::shared_ptr<Windowrino>, const SDL_Event &)> &&cb);
     virtual void loop(double time){}
+    Worldowrino world;
 private:
     SDL_Window *win;
     SDL_GLContext ctx;
