@@ -12,7 +12,7 @@ Worldowrino::Worldowrino() {
     // The world.
     dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher,broadphase,solver,collisionConfiguration);
     dynamicsWorld->setGravity(btVector3(0,-10,0));
-    
+
     // adding a collision shape
     btCollisionShape* shape = new btStaticPlaneShape(btVector3(0, 1, 0), 1);
     btDefaultMotionState* motionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,-1,0)));
@@ -31,6 +31,10 @@ void Worldowrino::resize(float width, float height) {
     projection = glm::perspective(45.0f, width / height, 0.1f, 100.0f);
 }
 
+void Worldowrino::addShapodino(std::shared_ptr<Shapodino> shape) {
+    shapodinos.push_back(shape);
+}
+
 Worldowrino::~Worldowrino() {
     // Clean up the Bullet physicserino
     delete dynamicsWorld;
@@ -40,8 +44,20 @@ Worldowrino::~Worldowrino() {
     delete broadphase;
 }
 
-void Worldowrino::draw(const char *shaderName) {
-    shaderinos[shaderName]->use();
+void Worldowrino::draw(std::shared_ptr<Shaderino> shader) {
+    // use shader
+    shader->use();
+    // can only support one texture for now
+    GLuint textureunit  = glGetUniformLocation(shader->programid, "texture0");
+    glUniform1i(textureunit, 0);
+    // get mvp uniform - we set this
+    // for every shape
+    GLuint MatrixID = glGetUniformLocation(shader->programid, "MVP");
+    for(auto it = shapodinos.begin(); it < shapodinos.end(); ++it) {
+        glm::mat4 mvp = camerino.getMVP(projection, (*it)->modelMatrix);
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(mvp));
+        (*it)->draw();
+    }
 }
 
 /*
@@ -179,12 +195,16 @@ Camerino::Camerino() {
     mvp = projection * view * model; // Remember, matrix multiplication is the other way around
 }
 
+glm::mat4 Camerino::getMVP(const glm::mat4 &projection, const glm::mat4 &mymodel) {
+    return projection * view * mymodel;
+}
+
 /*
 * Helperino for compiling and
 * using shader programinos  *
 * * * * * * * * * * * * * * */
 Shaderino::Shaderino() {
-    id = glCreateProgram();
+    programid = glCreateProgram();
 }
 
 std::string Shaderino::readfile(const char *path) {
@@ -226,9 +246,9 @@ void Shaderino::compile(const char *filename, GLenum shaderType) {
 
 void Shaderino::link() {
     for(auto itr = shaders.begin(); itr < shaders.end(); ++itr) {
-        glAttachShader(id, *itr);
+        glAttachShader(programid, *itr);
     }
-    glLinkProgram(id);
+    glLinkProgram(programid);
     for(auto itr = shaders.begin(); itr < shaders.end(); ++itr) {
         glDeleteShader(*itr);
     }
@@ -237,10 +257,10 @@ void Shaderino::link() {
     GLint Result = GL_FALSE;
     int InfoLogLength;
 
-    glGetProgramiv(id, GL_LINK_STATUS, &Result);
-    glGetProgramiv(id, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    glGetProgramiv(programid, GL_LINK_STATUS, &Result);
+    glGetProgramiv(programid, GL_INFO_LOG_LENGTH, &InfoLogLength);
     std::vector<char> ProgramErrorMessage(fmax(InfoLogLength, int(1)));
-    glGetProgramInfoLog(id, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+    glGetProgramInfoLog(programid, InfoLogLength, NULL, &ProgramErrorMessage[0]);
 
     if(!Result) {
         std::cout << "SHADER LINKING ERROR" << std::endl;
@@ -250,9 +270,9 @@ void Shaderino::link() {
 }
 
 void Shaderino::use() {
-    glUseProgram(id);
+    glUseProgram(programid);
 }
 
 Shaderino::~Shaderino() {
-    glDeleteProgram(id);
+    glDeleteProgram(programid);
 }

@@ -2,6 +2,7 @@
 
 class MyWindow : public Windowrino {
 public:
+    std::shared_ptr<Shaderino> shader;
     MyWindow(const char *title,
         int x,
         int y,
@@ -16,45 +17,52 @@ public:
         h,
         flags
     ){
+        // Enable opengl stuff
+        glEnable(GL_DEPTH_TEST);
+
         // Compile a shader
-        auto shader = std::make_shared<Shaderino>();
+        shader = std::make_shared<Shaderino>();
         shader->compile("shaders/test.vs", GL_VERTEX_SHADER);
         shader->compile("shaders/test.fs", GL_FRAGMENT_SHADER);
         shader->link();
-        worldowrino.shaderinos["texture_shader"] = shader;
-
         shader->use();
 
-        // Enable depth test
-        glEnable(GL_DEPTH_TEST);
-
-        Camerino camera;
-
+        // create a builder that can build a shape
         ShapodinoBuilder texture_cube_builder(
             "res/test_objs/textured_cube.obj",
             "res/test_objs/"
         );
 
-        // set "MVP" uniform
-        GLuint MatrixID = glGetUniformLocation(shader->id, "MVP");
-        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(camera.mvp));
-
-        // Get "myTextureSampler" uniform
-        GLuint textureunit  = glGetUniformLocation(shader->id, "texture0");
-        glUniform1i(textureunit, 0);
-
-        // make a shape and draw
+        // create a shape
         auto shape = texture_cube_builder.makeShapodino();
-        glClearColor(0.5, 0.5, 1.0, 1.0);
+
+        // make a shared shape and add it to the world
+        auto shared_shape = std::make_shared<Shapodino>(shape);
+        world.addShapodino(shared_shape);
+
+        // control the shape with arrow keys
+        on(SDL_KEYDOWN, [shared_shape](std::shared_ptr<Windowrino> win, const SDL_Event &event) {
+            if(event.key.keysym.sym == SDLK_LEFT) {
+                shared_shape->modelMatrix = glm::rotate(shared_shape->modelMatrix, .2f, glm::vec3(0.0, 1.0, 0.0));
+            } else if(event.key.keysym.sym == SDLK_RIGHT) {
+                shared_shape->modelMatrix = glm::rotate(shared_shape->modelMatrix, -.2f, glm::vec3(0.0, 1.0, 0.0));
+            } else if(event.key.keysym.sym == SDLK_UP) {
+                shared_shape->modelMatrix = glm::translate(shared_shape->modelMatrix, glm::vec3(0.0, 0.0, 1.0f));
+            }else if(event.key.keysym.sym == SDLK_DOWN) {
+                shared_shape->modelMatrix = glm::translate(shared_shape->modelMatrix, glm::vec3(0.0, 0.0, -1.0));
+            }
+        });
+    }
+    void loop(double time) {
+        // make background light purple
+        glClearColor(.5, .5, .5, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shape.draw();
+
+        // draw using our shader
+        world.draw(shader);
 
         // swap buffers
         swap();
-    }
-    void loop(double time) {
-        // this is where we want to draw out world
-        //std::cout << "the time is: " << time << std::endl;
     }
 };
 

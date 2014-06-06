@@ -12,6 +12,7 @@
 #include <BulletDynamics/btBulletDynamicsCommon.h>
 #include <GL/glew.h>
 #include <fstream>
+#include <string>
 
 #include "bufferino.h"
 
@@ -20,8 +21,8 @@ public:
     Shapodino() : modelMatrix(glm::mat4(1.0)) {}
     void pushBufferSequence(std::shared_ptr<BufferSequerino> bufferinoSequence);
     void draw();
-private:
     glm::mat4 modelMatrix;
+private:
     std::vector<std::shared_ptr<BufferSequerino>> bufferinos;
 };
 
@@ -41,27 +42,10 @@ public:
     void compile(const char* filename, GLenum shaderType);
     void link();
     void use();
-    GLuint id;
+    GLuint programid;
 private:
     std::string readfile(const char *path);
     std::vector<GLuint> shaders;
-};
-
-class Worldowrino {
-public:
-    Worldowrino();
-    ~Worldowrino();
-    void draw(const char *shaderName);
-    void resize(float width, float height);
-    std::map<std::string, std::shared_ptr<Shaderino>> shaderinos;
-private:
-    glm::mat4 projection;
-    std::vector<Shapodino> shapodinos;
-    btBroadphaseInterface *broadphase;
-    btDefaultCollisionConfiguration *collisionConfiguration;
-    btCollisionDispatcher *dispatcher;
-    btSequentialImpulseConstraintSolver *solver;
-    btDiscreteDynamicsWorld *dynamicsWorld;
 };
 
 class Camerino {
@@ -71,4 +55,23 @@ public:
     glm::mat4 model;
     glm::mat4 mvp;
     Camerino();
+    glm::mat4 getMVP(const glm::mat4 &projection, const glm::mat4 &model);
+};
+
+class Worldowrino {
+public:
+    Worldowrino();
+    ~Worldowrino();
+    void draw(std::shared_ptr<Shaderino> shader);
+    void resize(float width, float height);
+    void addShapodino(std::shared_ptr<Shapodino> shape);
+private:
+    glm::mat4 projection;
+    Camerino camerino;
+    std::vector<std::shared_ptr<Shapodino>> shapodinos;
+    btBroadphaseInterface *broadphase;
+    btDefaultCollisionConfiguration *collisionConfiguration;
+    btCollisionDispatcher *dispatcher;
+    btSequentialImpulseConstraintSolver *solver;
+    btDiscreteDynamicsWorld *dynamicsWorld;
 };
