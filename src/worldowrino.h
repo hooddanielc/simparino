@@ -17,12 +17,17 @@
 #include "bufferino.h"
 
 class Shapodino {
+friend class ShapodinoBuilder;
 public:
-    Shapodino() : modelMatrix(glm::mat4(1.0)) {}
+    Shapodino();
     void pushBufferSequence(std::shared_ptr<BufferSequerino> bufferinoSequence);
     void draw();
-    glm::mat4 modelMatrix;
+    void setModel(glm::mat4 modelMatrix);
+    glm::mat4 getModel();
 private:
+    void setMesh(btTriangleMesh *mesh);
+    btTriangleMesh *bt_mesh;
+    glm::mat4 modelMatrix;
     std::vector<std::shared_ptr<BufferSequerino>> bufferinos;
 };
 

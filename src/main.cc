@@ -40,16 +40,38 @@ public:
         auto shared_shape = std::make_shared<Shapodino>(shape);
         world.addShapodino(shared_shape);
 
+        // make another shape
+        auto shared_shape_2 = std::make_shared<Shapodino>(shape);
+        world.addShapodino(shared_shape_2);
+
+        // create a hedge builder
+        ShapodinoBuilder hedge_plane_builder(
+            "res/test_objs/hedge-plane.obj",
+            "res/test_objs/"
+        );
+
+        hedge_plane_builder.printToConsole();
+
+        // create shape
+        auto shape_hedge = hedge_plane_builder.makeShapodino();
+
+        // get shared version
+        auto shared_shape_hedge = std::make_shared<Shapodino>(shape_hedge);
+        world.addShapodino(shared_shape_hedge);
+
+        // translate shape down a couple units
+        shared_shape_hedge->setModel(glm::translate(shared_shape_hedge->getModel(), glm::vec3(0.0, -1.0, 0.0)));
+
         // control the shape with arrow keys
         on(SDL_KEYDOWN, [shared_shape](std::shared_ptr<Windowrino> win, const SDL_Event &event) {
             if(event.key.keysym.sym == SDLK_LEFT) {
-                shared_shape->modelMatrix = glm::rotate(shared_shape->modelMatrix, .2f, glm::vec3(0.0, 1.0, 0.0));
+                shared_shape->setModel(glm::rotate(shared_shape->getModel(), .2f, glm::vec3(0.0, 1.0, 0.0)));
             } else if(event.key.keysym.sym == SDLK_RIGHT) {
-                shared_shape->modelMatrix = glm::rotate(shared_shape->modelMatrix, -.2f, glm::vec3(0.0, 1.0, 0.0));
+                shared_shape->setModel(glm::rotate(shared_shape->getModel(), -.2f, glm::vec3(0.0, 1.0, 0.0)));
             } else if(event.key.keysym.sym == SDLK_UP) {
-                shared_shape->modelMatrix = glm::translate(shared_shape->modelMatrix, glm::vec3(0.0, 0.0, 1.0f));
+                shared_shape->setModel(glm::translate(shared_shape->getModel(), glm::vec3(0.0, 0.0, 1.0)));
             }else if(event.key.keysym.sym == SDLK_DOWN) {
-                shared_shape->modelMatrix = glm::translate(shared_shape->modelMatrix, glm::vec3(0.0, 0.0, -1.0));
+                shared_shape->setModel(glm::translate(shared_shape->getModel(), glm::vec3(0.0, 0.0, -1.0)));
             }
         });
     }

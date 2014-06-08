@@ -23,6 +23,9 @@ Worldowrino::Worldowrino() {
         btVector3(0,0,0)    // local inertia
     );
     btRigidBody *rigidBody = new btRigidBody(rigidBodyCI);
+
+
+
     dynamicsWorld->addRigidBody(rigidBody);
 }
 
@@ -54,7 +57,7 @@ void Worldowrino::draw(std::shared_ptr<Shaderino> shader) {
     // for every shape
     GLuint MatrixID = glGetUniformLocation(shader->programid, "MVP");
     for(auto it = shapodinos.begin(); it < shapodinos.end(); ++it) {
-        glm::mat4 mvp = camerino.getMVP(projection, (*it)->modelMatrix);
+        glm::mat4 mvp = camerino.getMVP(projection, (*it)->getModel());
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(mvp));
         (*it)->draw();
     }
@@ -66,8 +69,18 @@ void Worldowrino::draw(std::shared_ptr<Shaderino> shader) {
 * actually drawing a shape
 * at a specific position
 * * * * * * * * * * * * * */
+Shapodino::Shapodino() : modelMatrix(glm::mat4(1.0)) {}
+
 void Shapodino::pushBufferSequence(std::shared_ptr<BufferSequerino> bufferSequence) {
     bufferinos.push_back(bufferSequence);
+}
+
+void Shapodino::setModel(glm::mat4 model) {
+    modelMatrix = model;
+}
+
+glm::mat4 Shapodino::getModel() {
+    return modelMatrix;
 }
 
 void Shapodino::draw() {
@@ -75,6 +88,10 @@ void Shapodino::draw() {
         (*it)->bind();
         glDrawArrays(GL_TRIANGLES, 0, (*it)->getIndices());
     }
+}
+
+void Shapodino::setMesh(btTriangleMesh *mesh) {
+    bt_mesh = mesh;
 }
 
 /*
@@ -150,6 +167,7 @@ Shapodino ShapodinoBuilder::makeShapodino() {
             vtxPositions.push_back((*iterShape).mesh.positions[
                 ((*iterIndices) * 3) + 2
             ]);
+
             // gather uv coordinates
             uvCoords.push_back((*iterShape).mesh.texcoords[
                 (*iterIndices) * 2
@@ -174,6 +192,36 @@ Shapodino ShapodinoBuilder::makeShapodino() {
         buffer_sequence->build();
         shape.pushBufferSequence(buffer_sequence);
     }
+
+    // build triangle mesh shape for bullet physics
+    btTriangleMesh *mesh = new btTriangleMesh();
+    for(auto iterShape = shapes.begin(); iterShape < shapes.end(); ++iterShape) {
+        for(size_t i = 0; i < (*iterShape).mesh.indices.size() / 3; ++i) {
+            // index 1
+            auto idx1 = (*iterShape).mesh.indices[i * 3];
+            btVector3 v0(
+                (*iterShape).mesh.positions[(idx1 * 3)],
+                (*iterShape).mesh.positions[(idx1 * 3) + 1],
+                (*iterShape).mesh.positions[(idx1 * 3) + 2]
+            );
+            // index 2
+            auto idx2 = (*iterShape).mesh.indices[(i * 3) + 1];
+            btVector3 v1(
+                (*iterShape).mesh.positions[(idx2 * 3)],
+                (*iterShape).mesh.positions[(idx2 * 3) + 1],
+                (*iterShape).mesh.positions[(idx2 * 3) + 2]
+            );
+            // index 3
+            auto idx3 = (*iterShape).mesh.indices[(i * 3) + 2];
+            btVector3 v2(
+                (*iterShape).mesh.positions[(idx3 * 3)],
+                (*iterShape).mesh.positions[(idx3 * 3) + 1],
+                (*iterShape).mesh.positions[(idx3 * 3) + 2]
+            );
+            mesh->addTriangle(v0,v1,v2);
+        }
+    }
+    shape.setMesh(mesh);
     return shape;
 }
 
