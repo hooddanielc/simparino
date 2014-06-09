@@ -30,6 +30,7 @@ public:
 private:
     void setMesh(btTriangleMesh *mesh);
     void setMotionState(btDefaultMotionState *bulletMotionState);
+    void setCollisionShape(btCollisionShape *theCollisionShape);
     btCollisionShape* getCollisionShape();
     btCollisionShape* getStaticCollisionShape();
     btRigidBody *rigidBody;
@@ -78,7 +79,7 @@ public:
     ~Worldowrino();
     void draw(std::shared_ptr<Shaderino> shader);
     void resize(float width, float height);
-    void addShapodino(std::shared_ptr<Shapodino> shape, bool staticShape, int mass);
+    void addShapodino(std::shared_ptr<Shapodino> shape, bool staticShape, float mass);
     void stepSimulation(btScalar timeStep, int maxSubSteps = 1, btScalar fixedTimeStep = btScalar(1.)/btScalar(60.));
 private:
     glm::mat4 projection;

@@ -41,12 +41,12 @@ public:
         // make a shared shape and add it to the world
         auto shared_shape = std::make_shared<Shapodino>(shape);
         shared_shape->setModel(glm::translate(shared_shape->getModel(), glm::vec3(0.0, 1.0, 0.0)));
-        world.addShapodino(shared_shape, false, 1);
+        world.addShapodino(shared_shape, false, 0.1);
 
         // make another shape
         auto shared_shape_2 = std::make_shared<Shapodino>(shape);
         shared_shape_2->setModel(glm::translate(shared_shape_2->getModel(), glm::vec3(1.0, 10.0, 0.0)));
-        world.addShapodino(shared_shape_2, false, 1);
+        world.addShapodino(shared_shape_2, false, 0.1);
 
         // create a plane with hedge texture
         ShapodinoBuilder hedge_plane_builder(
@@ -55,7 +55,7 @@ public:
         );
         auto shape_hedge = hedge_plane_builder.makeShapodino();
         auto shared_shape_hedge = std::make_shared<Shapodino>(shape_hedge);
-        world.addShapodino(shared_shape_hedge, true, 1);
+        world.addShapodino(shared_shape_hedge, true, 0);
 
         // translate shape down a couple units
         shared_shape_hedge->setModel(glm::translate(shared_shape_hedge->getModel(), glm::vec3(0.0, -1.0, 0.0)));
@@ -68,11 +68,11 @@ public:
         auto shape_monkey = psychedelic_monkey_builder.makeShapodino();
         auto my_monkey_shape = std::make_shared<Shapodino>(shape_monkey);
         my_monkey_shape->setModel(glm::translate(my_monkey_shape->getModel(), glm::vec3(0.0, 4.0, 0.0)));
-        world.addShapodino(my_monkey_shape, false, 1);
+        world.addShapodino(my_monkey_shape, false, 0.1);
 
         // step world with keypress
         on(SDL_KEYDOWN, [shared_shape](std::shared_ptr<Windowrino> win, const SDL_Event &event) {
-            //
+            //win->world.stepSimulation(1, 1);
         });
     }
     void loop(double time) {
@@ -82,10 +82,8 @@ public:
 
         double timeSinceLast = time - lastTime;
         lastTime = time;
-
         world.stepSimulation(time, 1);
         world.draw(shader);
-
         // swap buffers
         swap();
     }
