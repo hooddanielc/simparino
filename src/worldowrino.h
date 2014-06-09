@@ -18,14 +18,23 @@
 
 class Shapodino {
 friend class ShapodinoBuilder;
+friend class Worldowrino;
 public:
     Shapodino();
     void pushBufferSequence(std::shared_ptr<BufferSequerino> bufferinoSequence);
     void draw();
     void setModel(glm::mat4 modelMatrix);
     glm::mat4 getModel();
+    void setRigidBody(btRigidBody *body);
+    void updateMvpFromRigidBody();
 private:
     void setMesh(btTriangleMesh *mesh);
+    void setMotionState(btDefaultMotionState *bulletMotionState);
+    btCollisionShape* getCollisionShape();
+    btCollisionShape* getStaticCollisionShape();
+    btRigidBody *rigidBody;
+    btCollisionShape *collisionShape;
+    btDefaultMotionState *motionState;
     btTriangleMesh *bt_mesh;
     glm::mat4 modelMatrix;
     std::vector<std::shared_ptr<BufferSequerino>> bufferinos;
@@ -69,7 +78,8 @@ public:
     ~Worldowrino();
     void draw(std::shared_ptr<Shaderino> shader);
     void resize(float width, float height);
-    void addShapodino(std::shared_ptr<Shapodino> shape);
+    void addShapodino(std::shared_ptr<Shapodino> shape, bool staticShape, int mass);
+    void stepSimulation(btScalar timeStep, int maxSubSteps = 1, btScalar fixedTimeStep = btScalar(1.)/btScalar(60.));
 private:
     glm::mat4 projection;
     Camerino camerino;

@@ -12,30 +12,55 @@ Worldowrino::Worldowrino() {
     // The world.
     dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher,broadphase,solver,collisionConfiguration);
     dynamicsWorld->setGravity(btVector3(0,-10,0));
-
-    // adding a collision shape
-    btCollisionShape* shape = new btStaticPlaneShape(btVector3(0, 1, 0), 1);
-    btDefaultMotionState* motionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1), btVector3(0,-1,0)));
-    btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(
-        0,                  // mass
-        motionState,        // initial position
-        shape,              // collision shape of body
-        btVector3(0,0,0)    // local inertia
-    );
-    btRigidBody *rigidBody = new btRigidBody(rigidBodyCI);
-
-
-
-    dynamicsWorld->addRigidBody(rigidBody);
 }
 
 void Worldowrino::resize(float width, float height) {
-    std::cout << "resized: " << width / height << std::endl;
+    glViewport(0, 0, width, height);
     projection = glm::perspective(45.0f, width / height, 0.1f, 100.0f);
 }
 
-void Worldowrino::addShapodino(std::shared_ptr<Shapodino> shape) {
+void Worldowrino::stepSimulation(btScalar timeStep, int maxSubSteps, btScalar fixedTimeStep) {
+    dynamicsWorld->stepSimulation(timeStep, maxSubSteps, fixedTimeStep);
+    // update all shapes models
+    for(auto it = shapodinos.begin(); it < shapodinos.end(); ++it) {
+        // update mvp from rigid body
+        (*it)->updateMvpFromRigidBody();
+    }
+}
+
+void Worldowrino::addShapodino(std::shared_ptr<Shapodino> shape, bool staticShape, int mass) {
     shapodinos.push_back(shape);
+
+    // build shapodino motion state
+    glm::mat4 m = shape->getModel();
+    btDefaultMotionState *state = new btDefaultMotionState(btTransform(
+        btMatrix3x3(
+            m[0][0], m[0][1], m[0][2],
+            m[1][0], m[1][1], m[1][2],
+            m[2][0], m[2][1], m[2][2]
+        ),
+        btVector3(m[3][0], m[3][1], m[3][2])
+    ));
+    shape->setMotionState(state);
+    if(staticShape) {
+        btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(
+            0,
+            state,
+            shape->getStaticCollisionShape(),
+            btVector3(0,0,0)
+        );
+        groundRigidBodyCI.m_restitution = 0.3;
+        btRigidBody *groundRigidBody = new btRigidBody(groundRigidBodyCI);
+        shape->setRigidBody(groundRigidBody);
+        dynamicsWorld->addRigidBody(groundRigidBody);
+    } else {
+        btVector3 fallInertia(0,0,0);
+        shape->getCollisionShape()->calculateLocalInertia(mass, fallInertia);
+        btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, state, shape->getCollisionShape(), fallInertia);
+        btRigidBody *fallRigidBody = new btRigidBody(fallRigidBodyCI);
+        shape->setRigidBody(fallRigidBody);
+        dynamicsWorld->addRigidBody(fallRigidBody);
+    }
 }
 
 Worldowrino::~Worldowrino() {
@@ -69,7 +94,44 @@ void Worldowrino::draw(std::shared_ptr<Shaderino> shader) {
 * actually drawing a shape
 * at a specific position
 * * * * * * * * * * * * * */
-Shapodino::Shapodino() : modelMatrix(glm::mat4(1.0)) {}
+Shapodino::Shapodino() : modelMatrix(glm::mat4(1.0)),
+    collisionShape(nullptr),
+    rigidBody(nullptr) {}
+
+void Shapodino::updateMvpFromRigidBody() {
+    btTransform trans;
+    rigidBody->getMotionState()->getWorldTransform(trans);
+    btScalar m[16];
+    trans.getOpenGLMatrix(m);
+
+    modelMatrix[0][0] = m[0];
+    modelMatrix[0][1] = m[1];
+    modelMatrix[0][2] = m[2];
+    modelMatrix[0][3] = m[3];
+
+    modelMatrix[1][0] = m[4];
+    modelMatrix[1][1] = m[5];
+    modelMatrix[1][2] = m[6];
+    modelMatrix[1][3] = m[7];
+
+    modelMatrix[2][0] = m[8];
+    modelMatrix[2][1] = m[9];
+    modelMatrix[2][2] = m[10];
+    modelMatrix[2][3] = m[11];
+
+    modelMatrix[3][0] = m[12];
+    modelMatrix[3][1] = m[13];
+    modelMatrix[3][2] = m[14];
+    modelMatrix[3][3] = m[15];
+}
+
+void Shapodino::setRigidBody(btRigidBody *body) {
+    rigidBody = body;
+}
+
+void Shapodino::setMotionState(btDefaultMotionState *bulletMotionState) {
+    motionState = bulletMotionState;
+}
 
 void Shapodino::pushBufferSequence(std::shared_ptr<BufferSequerino> bufferSequence) {
     bufferinos.push_back(bufferSequence);
@@ -92,6 +154,20 @@ void Shapodino::draw() {
 
 void Shapodino::setMesh(btTriangleMesh *mesh) {
     bt_mesh = mesh;
+}
+
+btCollisionShape* Shapodino::getCollisionShape() {
+    if(collisionShape == nullptr) {
+        collisionShape = new btConvexTriangleMeshShape(bt_mesh, true);
+    }
+    return collisionShape;
+}
+
+btCollisionShape* Shapodino::getStaticCollisionShape() {
+    if(collisionShape == nullptr) {
+        collisionShape = new btBvhTriangleMeshShape(bt_mesh, false);
+    }
+    return collisionShape;
 }
 
 /*
@@ -199,6 +275,7 @@ Shapodino ShapodinoBuilder::makeShapodino() {
         for(size_t i = 0; i < (*iterShape).mesh.indices.size() / 3; ++i) {
             // index 1
             auto idx1 = (*iterShape).mesh.indices[i * 3];
+
             btVector3 v0(
                 (*iterShape).mesh.positions[(idx1 * 3)],
                 (*iterShape).mesh.positions[(idx1 * 3) + 1],
