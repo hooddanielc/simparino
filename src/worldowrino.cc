@@ -217,6 +217,13 @@ void ShapodinoBuilder::printToConsole() {
             shapes[i].mesh.texcoords[2*v+1]
             );
         }
+        for (size_t vn = 0; vn < shapes[i].mesh.normals.size() / 3; ++vn) {
+            printf("  vn[%ld] = (%f, %f, %f)\n", vn,
+            shapes[i].mesh.normals[3*vn+0],
+            shapes[i].mesh.normals[3*vn+1],
+            shapes[i].mesh.normals[3*vn+2]
+            );
+        }
         printf("shape[%ld].material.name = %s\n", i, shapes[i].material.name.c_str());
         printf("  material.Ka = (%f, %f ,%f)\n", shapes[i].material.ambient[0], shapes[i].material.ambient[1], shapes[i].material.ambient[2]);
         printf("  material.Kd = (%f, %f ,%f)\n", shapes[i].material.diffuse[0], shapes[i].material.diffuse[1], shapes[i].material.diffuse[2]);
@@ -242,6 +249,7 @@ Shapodino ShapodinoBuilder::makeShapodino() {
     for(auto iterShape = shapes.begin(); iterShape < shapes.end(); ++iterShape) {
         std::vector<float> vtxPositions;
         std::vector<float> uvCoords;
+        std::vector<float> vnPositions;
         for(auto iterIndices = (*iterShape).mesh.indices.begin(); iterIndices < (*iterShape).mesh.indices.end(); ++iterIndices) {
             // gather vertex positions
             vtxPositions.push_back((*iterShape).mesh.positions[
@@ -251,6 +259,17 @@ Shapodino ShapodinoBuilder::makeShapodino() {
                 ((*iterIndices) * 3) + 1
             ]);
             vtxPositions.push_back((*iterShape).mesh.positions[
+                ((*iterIndices) * 3) + 2
+            ]);
+
+            // gather vertex normals
+            vnPositions.push_back((*iterShape).mesh.normals[
+                ((*iterIndices) * 3)
+            ]);
+            vnPositions.push_back((*iterShape).mesh.normals[
+                ((*iterIndices) * 3) + 1
+            ]);
+            vnPositions.push_back((*iterShape).mesh.normals[
                 ((*iterIndices) * 3) + 2
             ]);
 
@@ -264,13 +283,20 @@ Shapodino ShapodinoBuilder::makeShapodino() {
         }
         // create a bufferino for the vertex positions
         std::shared_ptr<BufferSequerino> buffer_sequence = std::make_shared<BufferSequerino>();
+        // -> layout(location = 0)
         buffer_sequence->pushBuffer(MakeBufferino(
             std::move(vtxPositions),
             3
         ));
+        // -> layout(location = 1)
         buffer_sequence->pushBuffer(MakeBufferino(
             std::move(uvCoords),
             2
+        ));
+        // -> layout(location = 2)
+        buffer_sequence->pushBuffer(MakeBufferino(
+            std::move(vnPositions),
+            3
         ));
         buffer_sequence->pushTexture(GL_TEXTURE0, MakeTextureBufferino(
             (mtldir + (*iterShape).material.diffuse_texname).c_str()

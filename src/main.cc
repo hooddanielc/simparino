@@ -35,6 +35,8 @@ public:
             "res/test_objs/"
         );
 
+        texture_cube_builder.printToConsole();
+
         // create a shape
         auto shape = texture_cube_builder.makeShapodino();
 
