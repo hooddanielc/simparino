@@ -24,8 +24,8 @@ public:
 
         // Compile a shader
         shader = std::make_shared<Shaderino>();
-        shader->compile("shaders/test.vs", GL_VERTEX_SHADER);
-        shader->compile("shaders/test.fs", GL_FRAGMENT_SHADER);
+        shader->compile("shaders/simple.vs", GL_VERTEX_SHADER);
+        shader->compile("shaders/simple.fs", GL_FRAGMENT_SHADER);
         shader->link();
         shader->use();
 

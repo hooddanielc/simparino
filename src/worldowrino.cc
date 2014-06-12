@@ -312,7 +312,6 @@ Shapodino ShapodinoBuilder::makeShapodino() {
         for(size_t i = 0; i < (*iterShape).mesh.indices.size() / 3; ++i) {
             // index 1
             auto idx1 = (*iterShape).mesh.indices[i * 3];
-
             btVector3 v0(
                 (*iterShape).mesh.positions[(idx1 * 3)],
                 (*iterShape).mesh.positions[(idx1 * 3) + 1],
