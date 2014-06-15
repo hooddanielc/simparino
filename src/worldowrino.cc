@@ -87,9 +87,13 @@ void Worldowrino::draw(std::shared_ptr<Shaderino> shader) {
     // get mvp uniform - we set this
     // for every shape
     GLuint MatrixID = glGetUniformLocation(shader->programid, "MVP");
+    GLuint ModelMatrixID = glGetUniformLocation(shader->programid, "M");
+    GLuint ViewMatrixID = glGetUniformLocation(shader->programid, "V");
+    glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, glm::value_ptr(camerino.getView()));
     for(auto it = shapodinos.begin(); it < shapodinos.end(); ++it) {
         glm::mat4 mvp = camerino.getMVP(projection, (*it)->getModel());
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(mvp));
+        glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, glm::value_ptr(camerino.getModel()));
         (*it)->draw();
     }
 }
@@ -362,8 +366,18 @@ Camerino::Camerino() {
     mvp = projection * view * model; // Remember, matrix multiplication is the other way around
 }
 
-glm::mat4 Camerino::getMVP(const glm::mat4 &projection, const glm::mat4 &mymodel) {
-    return projection * view * mymodel;
+glm::mat4 Camerino::getMVP(const glm::mat4 &myprojection, const glm::mat4 &mymodel) {
+    projection = myprojection;
+    model = mymodel;
+    return myprojection * view * mymodel;
+}
+
+glm::mat4 Camerino::getView() {
+    return view;
+}
+
+glm::mat4 Camerino::getModel() {
+    return model;
 }
 
 /*

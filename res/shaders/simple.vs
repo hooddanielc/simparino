@@ -6,10 +6,37 @@ layout(location = 1) in vec2 uvcoord;
 layout(location = 2) in vec3 normals;
 
 out vec2 UV;
+out vec3 Position_worldspace;
+out vec3 Normal_cameraspace;
+out vec3 EyeDirection_cameraspace;
+out vec3 LightDirection_cameraspace;
+
 uniform mat4 MVP;
+uniform mat4 V;
+uniform mat4 M;
+vec3 LightPosition_worldspace = vec3(3, 3, 3);
 
 void main() {
     // Output position of the vertex, in clip space : MVP * position
     gl_Position =  MVP * vec4(vertex, 1);
+
+    // Position of the vertex, in worldspace : M * position
+    Position_worldspace = (M * vec4(vertex, 1)).xyz;
+
+    // Normal of the the vertex, in camera space
+    // Only correct if ModelMatrix does not scale the model!
+    // Use its inverse transpose if not.
+    Normal_cameraspace = (V * M * vec4(vertex, 0)).xyz;
+
+    // Vector that goes from the vertex to the camera, in camera space.
+    // In camera space, the camera is at the origin (0,0,0).
+    vec3 vertexPosition_cameraspace = ( V * M * vec4(vertex, 1)).xyz;
+    EyeDirection_cameraspace = LightPosition_worldspace - vertexPosition_cameraspace;
+
+    // Vector that goes from the vertex to the light, in camera space. M is ommited because it's identity.
+    vec3 LightPosition_cameraspace = (V * vec4(LightPosition_worldspace, 1)).xyz;
+    LightDirection_cameraspace = LightPosition_cameraspace + EyeDirection_cameraspace;
+
+    // Uv coordinate
     UV = uvcoord;
 }

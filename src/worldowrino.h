@@ -65,12 +65,15 @@ private:
 
 class Camerino {
 public:
+    Camerino();
+    glm::mat4 getMVP(const glm::mat4 &projection, const glm::mat4 &model);
+    glm::mat4 getView();
+    glm::mat4 getModel();
+private:
     glm::mat4 projection;
     glm::mat4 view;
     glm::mat4 model;
     glm::mat4 mvp;
-    Camerino();
-    glm::mat4 getMVP(const glm::mat4 &projection, const glm::mat4 &model);
 };
 
 class Worldowrino {
