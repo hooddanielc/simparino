@@ -77,6 +77,14 @@ private:
     glm::mat4 mvp;
 };
 
+class Lighterino {
+public:
+    Lighterino();
+private:
+    glm::vec3 color;
+    glm::vec3 position;
+};
+
 class Worldowrino {
 public:
     Worldowrino();

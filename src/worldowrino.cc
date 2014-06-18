@@ -466,3 +466,7 @@ void Shaderino::use() {
 Shaderino::~Shaderino() {
     glDeleteProgram(programid);
 }
+
+Lighterino::Lighterino() : color(1.0), position(3.0) {
+    // TODO : intensity, distance?
+}
