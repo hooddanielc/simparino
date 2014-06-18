@@ -9,6 +9,7 @@ in vec3 LightDirection_cameraspace;
 out vec3 color;
 
 uniform sampler2D texture0;
+uniform uint max_array_size;
 
 vec3 getColorFromLight(vec3 lightpos) {
     // Light emission properties

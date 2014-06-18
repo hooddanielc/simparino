@@ -59,6 +59,7 @@ public:
     void use();
     GLuint programid;
 private:
+    bool linked;
     std::string readfile(const char *path);
     std::vector<GLuint> shaders;
 };

@@ -79,6 +79,8 @@ Worldowrino::~Worldowrino() {
 }
 
 void Worldowrino::draw(std::shared_ptr<Shaderino> shader) {
+    // enable opengl stuff
+    glEnable(GL_DEPTH_TEST);
     // use shader
     shader->use();
     // can only support one texture for now
@@ -384,7 +386,7 @@ glm::mat4 Camerino::getModel() {
 * Helperino for compiling and
 * using shader programinos  *
 * * * * * * * * * * * * * * */
-Shaderino::Shaderino() {
+Shaderino::Shaderino() : linked(false) {
     programid = glCreateProgram();
 }
 
@@ -426,6 +428,7 @@ void Shaderino::compile(const char *filename, GLenum shaderType) {
 }
 
 void Shaderino::link() {
+    assert(!linked);
     for(auto itr = shaders.begin(); itr < shaders.end(); ++itr) {
         glAttachShader(programid, *itr);
     }
@@ -448,6 +451,12 @@ void Shaderino::link() {
         fprintf(stdout, "%s\n", &ProgramErrorMessage[0]);
         std::exit(EXIT_FAILURE);
     }
+
+    // set max array size uniform
+    GLint max_array_size_loc = glGetUniformLocation(programid, "max_array_size");
+    glUniform1ui(max_array_size_loc, GL_MAX_VERTEX_UNIFORM_VECTORS);
+
+    linked = true;
 }
 
 void Shaderino::use() {

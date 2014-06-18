@@ -14,6 +14,7 @@ out vec3 LightDirection_cameraspace;
 uniform mat4 MVP;
 uniform mat4 V;
 uniform mat4 M;
+uniform uint max_array_size;
 vec3 LightPosition_worldspace = vec3(3, 3, 3);
 
 void main() {

@@ -19,8 +19,6 @@ public:
         flags
     ) {
         lastTime = 0;
-        // Enable opengl stuff
-        glEnable(GL_DEPTH_TEST);
 
         // Compile a shader
         shader = std::make_shared<Shaderino>();
@@ -34,8 +32,6 @@ public:
             "res/test_objs/textured_cube.obj",
             "res/test_objs/"
         );
-
-        texture_cube_builder.printToConsole();
 
         // create a shape
         auto shape = texture_cube_builder.makeShapodino();
